@@ -7,7 +7,7 @@ type FontSpec = {family: string; url: string; weight: string};
  * browser reports them loaded. The wait is capped, so a stalled load in a
  * freshly opened headless tab can never time out the whole render.
  */
-export const loadFontsSafely = (fonts: FontSpec[]) => {
+const loadNow = (fonts: FontSpec[]) => {
 	const css = fonts
 		.map(
 			(f) =>
@@ -24,4 +24,17 @@ export const loadFontsSafely = (fonts: FontSpec[]) => {
 	return Promise.race([loaded, cap])
 		.catch((err) => console.error('font loading failed', err))
 		.finally(() => continueRender(handle));
+};
+
+/**
+ * Returns an `ensure()` to call from the composition that needs the fonts:
+ * they are loaded once, on first use, so a composition never waits on
+ * fonts it does not use.
+ */
+export const lazyFonts = (fonts: () => FontSpec[]) => {
+	let started: Promise<unknown> | null = null;
+	return () => {
+		if (!started) started = loadNow(fonts());
+		return started;
+	};
 };

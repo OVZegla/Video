@@ -1,6 +1,4 @@
 import {Composition} from 'remotion';
-import './fonts';
-import './symps/fonts';
 import {VisionUrbaine} from './VisionUrbaine';
 import {DURATION, FPS, HEIGHT, WIDTH} from './theme';
 import {SympsWallPrinters, SYMPS_DURATION} from './symps/SympsWallPrinters';

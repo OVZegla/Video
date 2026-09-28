@@ -2,6 +2,7 @@ import React from 'react';
 import {AbsoluteFill, Sequence, useCurrentFrame} from 'remotion';
 import {LINE_DURATION, LineTransition, lineMask, lineState} from './components/LineTransition';
 import {Grain, Vignette} from './components/Stage';
+import {ensureSympsFonts} from './fonts';
 import {FIRST_ACT_COUNT, PRODUCTS, type Product} from './data/products';
 import {mastScreenX} from './layout';
 import {ApplicationScene, APPS_DURATION} from './scenes/ApplicationScene';
@@ -106,6 +107,7 @@ const Shell: React.FC<{seg: Placed; children: React.ReactNode}> = ({seg, childre
 };
 
 export const SympsWallPrinters: React.FC = () => {
+	ensureSympsFonts();
 	return (
 		<AbsoluteFill style={{background: '#000'}}>
 			{TIMELINE.map((seg) => (

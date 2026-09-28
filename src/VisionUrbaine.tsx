@@ -1,5 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Sequence, useCurrentFrame} from 'remotion';
+import {ensureFonts} from './fonts';
 import {C, DURATION, ease, prog, WIN_COUNT, WIN_W, winX} from './theme';
 import {LogoScene} from './scenes/LogoScene';
 import {Imaginez, IMAGINEZ_LEN} from './scenes/Imaginez';
@@ -79,6 +80,7 @@ const WindowTicks: React.FC = () => {
 };
 
 export const VisionUrbaine: React.FC = () => {
+	ensureFonts();
 	const frame = useCurrentFrame();
 	const logoOut = 1 - prog(frame, T.logoOut[0], T.logoOut[1], ease.inOut);
 	const logoIn = prog(frame, T.logoIn[0], T.logoIn[1], ease.inOut);
