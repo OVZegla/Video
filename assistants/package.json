@@ -1,0 +1,26 @@
+{
+  "name": "equipe-assistants-promo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Publicité 60 s — concept d'application : six assistants IA pour petites entreprises (Remotion)",
+  "scripts": {
+    "studio": "remotion studio",
+    "typecheck": "tsc --noEmit",
+    "audio": "node scripts/synth-audio.mjs",
+    "stills": "node scripts/stills.mjs",
+    "render": "remotion render Publicite out/publicite-assistants-60s.mp4 --concurrency=4"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.5",
+    "@fontsource-variable/inter-tight": "^5.2.5",
+    "@remotion/cli": "4.0.290",
+    "@remotion/fonts": "4.0.290",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.290"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}

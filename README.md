@@ -1,3 +1,5 @@
+> **Autre projet de ce dépôt :** `assistants/` — publicité 60 s pour un concept d’application (six assistants IA pour petites entreprises). Voir `assistants/README.md`.
+
 # Vision Urbaine — LED storefront loop
 
 Remotion project for a **30 s seamless loop** on transparent LED storefront panels
