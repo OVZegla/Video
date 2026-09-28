@@ -1,17 +1,10 @@
-import {loadFont} from '@remotion/fonts';
 import {staticFile} from 'remotion';
+import {loadFontsSafely} from '../loadFontsSafely';
 import {FONT} from './theme';
 
 // Inter (SIL OFL): contemporary Swiss grotesque, bundled for offline renders.
-const weights = ['200', '300', '400', '500', '600'] as const;
+const weights = ['200', '300', '400', '500', '600'];
 
-export const sympsFontsReady = Promise.all(
-	weights.map((weight) =>
-		loadFont({
-			family: FONT,
-			url: staticFile(`symps/fonts/inter-latin-${weight}-normal.woff2`),
-			weight,
-			format: 'woff2',
-		}),
-	),
+export const sympsFontsReady = loadFontsSafely(
+	weights.map((weight) => ({family: FONT, url: staticFile(`symps/fonts/inter-latin-${weight}-normal.woff2`), weight})),
 );

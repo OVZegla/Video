@@ -47,14 +47,18 @@ export const ProductReveal: React.FC<{product: Product; duration: number; hero?:
 	let extraBack: React.ReactNode = null;
 	let extraFront: React.ReactNode = null;
 
-	const rev = prog(f, 2, hero ? 110 : 46, ease.inOut);
+	const rev = prog(f, 2, hero ? 96 : 46, ease.inOut);
 
 	switch (mood) {
 		case 'darkSide': {
 			lightOverlay = (
 				<>
-					<SideLight p={rev} from="left" softness={0.5} />
-					<AbsoluteFill style={{background: 'linear-gradient(90deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.45) 100%)'}} />
+					<SideLight p={rev} from={product.side} softness={0.5} />
+					<AbsoluteFill
+						style={{
+							background: `linear-gradient(${product.side === 'right' ? 270 : 90}deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.45) 100%)`,
+						}}
+					/>
 				</>
 			);
 			rim = 0.25 * rev;
