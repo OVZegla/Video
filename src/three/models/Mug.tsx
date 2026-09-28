@@ -53,11 +53,12 @@ const handleGeometry = () => {
 	return g;
 };
 
-/** Sublimation print: transparent canvas wrapped on the mug body. */
-const usePrint = (name: string) => {
+/** Sublimation prints (one per name): transparent canvases wrapped on the mug body. */
+const usePrints = (names: string[]) => {
 	const logo = useImage('brand/vision-urbaine-logo.png');
 	return useMemo(() => {
 		if (!logo) return null;
+		return names.map((name) => {
 		const {c, ctx} = makeCanvas(1400, 700);
 		// Bauhaus band motif
 		ctx.fillStyle = C.brandNavy;
@@ -84,16 +85,24 @@ const usePrint = (name: string) => {
 		const lw = 640;
 		ctx.drawImage(logo, 700 - lw / 2 + 60, 540, lw, lw / (logo.width / logo.height));
 		return toTexture(c);
-	}, [logo, name]);
+		});
+	}, [logo, names]);
 };
 
 const glaze = {color: '#fbfbf8', roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.04, sheen: 0} as const;
 
-export const Mug: React.FC<{rotY: number; name?: string}> = ({rotY, name = 'Léa'}) => {
+const DEFAULT_NAMES = ['Léa'];
+
+/**
+ * `names` + `nameIndex`: the personalised name shown (swap it while the print
+ * faces away from the camera and the change is invisible).
+ */
+export const Mug: React.FC<{rotY: number; names?: string[]; nameIndex?: number}> = ({rotY, names = DEFAULT_NAMES, nameIndex = 0}) => {
 	const outer = useMemo(() => new LatheGeometry(outerProfile(), 128), []);
 	const inner = useMemo(() => new LatheGeometry(innerProfile(), 128), []);
 	const handle = useMemo(handleGeometry, []);
-	const print = usePrint(name);
+	const prints = usePrints(names);
+	const print = prints ? prints[((nameIndex % names.length) + names.length) % names.length] : null;
 	return (
 		<group rotation={[0, rotY, 0]} position={[0, 0.05, 0]}>
 			<group position={[-0.26, 0, 0]}>
