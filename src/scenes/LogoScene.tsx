@@ -1,0 +1,105 @@
+import React from 'react';
+import {C, FONT, lerp, WIDTH} from '../theme';
+import {LOGO_RATIO, LogoImage} from '../components/Logo';
+import {Layer, Reveal} from '../components/primitives';
+
+const LOGO_W = 500;
+const LOGO_H = LOGO_W / LOGO_RATIO;
+export const LOGO_CY = 146;
+const LOGO_TOP = LOGO_CY - LOGO_H / 2;
+
+/**
+ * The "rest" composition — the loop's anchor pose: the Vision Urbaine logo
+ * across the three central windows, a tricolour rule and a quiet tagline.
+ *
+ * `p` = 0 collapsed to a point in the centre window, 1 fully laid out.
+ * The scene exits by running p back to 0, and the finale re-enters by running
+ * it to 1, so the last frame and the first frame are the same pose.
+ * The opening grows out of the centre — exactly where the SANS LIMITES line
+ * collapses — so the hand-off reads as one gesture.
+ */
+export const LogoScene: React.FC<{p: number}> = ({p}) => {
+	const seg = (a: number, b: number) =>
+		Math.max(0, Math.min(1, (p - a) / (b - a)));
+
+	const line = seg(0, 0.45); // horizon line widens from the centre
+	const open = seg(0.2, 0.8); // logo shutter opens outwards
+	const lineFade = 1 - seg(0.55, 0.85);
+	const bar = seg(0.6, 0.9);
+	const tag = seg(0.7, 1);
+
+	const lineW = lerp(0, LOGO_W + 40, line);
+	const inset = (1 - open) * 50;
+
+	return (
+		<Layer>
+			{/* horizon line — the thread that the logo opens from */}
+			<div
+				style={{
+					position: 'absolute',
+					top: LOGO_CY - 1,
+					left: WIDTH / 2 - lineW / 2,
+					width: lineW,
+					height: 2,
+					background: C.white,
+					opacity: lineFade,
+				}}
+			/>
+			{/* logo, opened like a shutter from its centre */}
+			<div
+				style={{
+					position: 'absolute',
+					left: WIDTH / 2 - LOGO_W / 2,
+					top: LOGO_TOP,
+					clipPath: `inset(0 ${inset}% 0 ${inset}%)`,
+					transform: `scale(${lerp(1.08, 1, open)})`,
+				}}
+			>
+				<LogoImage width={LOGO_W} />
+			</div>
+			{/* tricolour rule */}
+			<div
+				style={{
+					position: 'absolute',
+					top: 188,
+					left: WIDTH / 2 - 27,
+					width: 54,
+					height: 3,
+					display: 'flex',
+					transform: `scaleX(${bar})`,
+				}}
+			>
+				<div style={{flex: 1, background: C.blue}} />
+				<div style={{flex: 1, background: C.white}} />
+				<div style={{flex: 1, background: C.red}} />
+			</div>
+			{/* tagline */}
+			<Reveal
+				p={tag}
+				style={{
+					position: 'absolute',
+					top: 204,
+					left: 0,
+					width: WIDTH,
+					display: 'flex',
+					justifyContent: 'center',
+				}}
+			>
+				<div
+					style={{
+						fontFamily: FONT,
+						fontWeight: 500,
+						fontSize: 11,
+						letterSpacing: '0.34em',
+						paddingLeft: '0.34em',
+						color: C.white,
+						opacity: 0.85,
+						whiteSpace: 'nowrap',
+					}}
+				>
+					PERSONNALISATION · GRAVURE · SIGNALÉTIQUE
+				</div>
+			</Reveal>
+		</Layer>
+	);
+};
