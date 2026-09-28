@@ -1,13 +1,14 @@
 import React from 'react';
 import {useCurrentFrame} from 'remotion';
-import {C, ease, HEIGHT, prog, WIN_W} from '../theme';
-import {HeroCard, ProductCard, spinIn} from '../components/Cards';
-import {MotifShape, Ribbon} from '../components/Patterns';
+import {C, ease, prog} from '../theme';
+import {HeroCard, ProductCard, SpanHero, spinIn} from '../components/Cards';
+import {Motif, Ribbon} from '../components/Patterns';
 import {Mug} from '../three/models/Mug';
 import {EngravedAcrylic, PrintedAcrylic} from '../three/models/Acrylic';
 import {LaserCutRosette, WoodPanel} from '../three/models/Wood';
 import {BladeSign, DecorPanel, MetalPlaque} from '../three/models/Signage';
 import {LaserCutting} from '../three/models/LaserCutting';
+import {BacklitPanel, Claustra, MetalScreen} from '../three/models/Interior';
 import {INK} from './palette';
 import {Win} from './Win';
 
@@ -92,31 +93,135 @@ export const SceneB: React.FC<SceneProps> = ({inAt, outAt}) => (
 				</ProductCard>
 			)}
 		</Win>
+		{/* PERSONNALISEZ spans the three right-hand windows, whole letters per window */}
 		<Win i={2} inAt={inAt} outAt={outAt} ground="red" ribbon={RIBBON_B}
 			motifs={[
-				{kind: 'eye', cx: 64, cy: 44, r: 34, accent: C.white, hole: C.red},
+				{kind: 'eye', cx: 64, cy: 50, r: 36, accent: C.white, hole: C.red},
 				{kind: 'arcs', cx: 128, cy: 320, r: 90, n: 4, rot: 180},
 			]}
 		>
-			{(lf) => <HeroCard lf={lf} ink={INK.red} lines={['PERSON-', 'NALISEZ']} accentLine={1} sub={['Chaque pièce', 'est unique']} />}
+			{(lf) => <SpanHero lf={lf} word="PERSONNALISEZ" parts={3} part={0} ink={INK.red} />}
 		</Win>
-		<Win i={3} inAt={inAt} outAt={outAt} ground="ice" ribbon={RIBBON_B}
-			motifs={[{kind: 'tri', x: 0, y: 0, cell: 32, cols: 4, rows: 1}]}
+		<Win i={3} inAt={inAt} outAt={outAt} ground="blue" ribbon={RIBBON_B}
+			motifs={[
+				{kind: 'tri', x: 0, y: 0, cell: 32, cols: 4, rows: 2},
+				{kind: 'vstripes', x: 14, y: 262, w: 100, h: 58, n: 7, from: 'bottom'},
+			]}
+		>
+			{(lf) => <SpanHero lf={lf} word="PERSONNALISEZ" parts={3} part={1} ink={INK.red} sub={['Chaque pièce', 'est unique']} />}
+		</Win>
+		<Win i={4} inAt={inAt} outAt={outAt} ground="sky" ribbon={RIBBON_B}
+			motifs={[
+				{kind: 'quarter', cx: 128, cy: 0, r: 96, rot: 90},
+				{kind: 'half', cx: 64, cy: 320, r: 50, rot: 0},
+			]}
+		>
+			{(lf) => <SpanHero lf={lf} word="PERSONNALISEZ" parts={3} part={2} ink={INK.red} />}
+		</Win>
+	</>
+);
+
+/* ------------------------------------------------ D — DÉCOREZ : agencement, grands formats */
+const RIBBON_D: Ribbon = {y0: 120, amp: 70, waves: 1.4, n: 7, gap: 9, width: 4.5, tilt: 60};
+
+export const SceneD: React.FC<SceneProps> = ({inAt, outAt}) => (
+	<>
+		<Win i={0} inAt={inAt} outAt={outAt} ground="ice" ribbon={RIBBON_D}
+			motifs={[{kind: 'half', cx: 128, cy: 60, r: 50, rot: -90}]}
 		>
 			{(lf) => (
-				<ProductCard lf={lf} title={'DÉCORS\nIMPRIMÉS'} ink={INK.ice} floorY={-1.02}>
+				<ProductCard lf={lf} title={'CLAUSTRAS\nBOIS'} ink={INK.ice} camZ={7.4} floorY={-1.15}>
+					<Claustra rotY={spinIn(lf, 0.35, 0.3, 64)} />
+				</ProductCard>
+			)}
+		</Win>
+		<Win i={1} inAt={inAt} outAt={outAt} ground="red" ribbon={RIBBON_D}
+			motifs={[{kind: 'arcs', cx: 0, cy: 0, r: 100, n: 5, rot: 0}]}
+		>
+			{(lf) => (
+				<ProductCard lf={lf} title={'MURS\nRÉTROÉCLAIRÉS'} ink={INK.red} camZ={8} floorY={-1.3}>
+					<BacklitPanel rotY={spinIn(lf, -0.2, 0.25, 70)} glow={prog(lf, 24, 70, ease.inOut) * (0.9 + 0.1 * Math.sin(lf / 17))} />
+				</ProductCard>
+			)}
+		</Win>
+		<Win i={2} inAt={inAt} outAt={outAt} ground="blue" ribbon={RIBBON_D}
+			motifs={[
+				{kind: 'vstripes', x: 14, y: 0, w: 100, h: 64, n: 7},
+				{kind: 'tri', x: 16, y: 256, cell: 32, cols: 3, rows: 2},
+			]}
+		>
+			{(lf) => <HeroCard lf={lf} ink={INK.blue} lines={['DÉCOREZ']} sub={['Du petit objet', "à l'agencement", 'complet']} />}
+		</Win>
+		<Win i={3} inAt={inAt} outAt={outAt} ground="white" ribbon={RIBBON_D}
+			motifs={[{kind: 'quarter', cx: 0, cy: 320, r: 110, rot: -90}]}
+		>
+			{(lf) => (
+				<ProductCard lf={lf} title={'MÉTAL\nDÉCOUPÉ'} ink={INK.white} camZ={7.6} floorY={-1.1}>
+					<MetalScreen rotY={spinIn(lf, 0.25, 0.3, 58)} glow={prog(lf, 30, 70, ease.inOut)} />
+				</ProductCard>
+			)}
+		</Win>
+		<Win i={4} inAt={inAt} outAt={outAt} ground="deep" ribbon={RIBBON_D}
+			motifs={[{kind: 'eye', cx: 64, cy: 280, r: 40, accent: C.red, hole: C.blueDeep, pupil: C.white}]}
+		>
+			{(lf) => (
+				<ProductCard lf={lf} title={'DÉCORS\nMURAUX'} ink={INK.deep} floorY={-1.02}>
 					<DecorPanel rotY={spinIn(lf, -0.15, 0.3, 62)} />
 				</ProductCard>
 			)}
 		</Win>
-		<Win i={4} inAt={inAt} outAt={outAt} ground="blue" ribbon={RIBBON_B}
-			motifs={[{kind: 'quarter', cx: 128, cy: 0, r: 96, rot: 90}]}
+	</>
+);
+
+/* ------------------------------------------------ E — the verbs of the showroom wall */
+const RIBBON_E: Ribbon = {y0: 250, amp: 40, waves: 2, n: 6, gap: 8, width: 4};
+const VERBS: {word: string; ground: 'red' | 'white' | 'blue' | 'sky' | 'deep'; motifs: Motif[]}[] = [
+	{word: 'FABRIQUER', ground: 'red', motifs: [{kind: 'vstripes', x: 14, y: 0, w: 100, h: 80, n: 7}]},
+	{word: 'SIGNALER', ground: 'white', motifs: [{kind: 'tri', x: 16, y: 16, cell: 32, cols: 3, rows: 2}]},
+	{word: 'DÉCORER', ground: 'blue', motifs: [{kind: 'half', cx: 64, cy: 0, r: 60, rot: 180}]},
+	{word: 'VALORISER', ground: 'sky', motifs: [{kind: 'arcs', cx: 128, cy: 0, r: 100, n: 5, rot: 90}]},
+	{word: 'GRAVER', ground: 'deep', motifs: [{kind: 'eye', cx: 64, cy: 58, r: 40, accent: C.red, hole: C.blueDeep, pupil: C.white}]},
+];
+
+export const SceneE: React.FC<SceneProps> = ({inAt, outAt}) => (
+	<>
+		{VERBS.map((v, i) => (
+			<Win key={v.word} i={i} inAt={inAt} outAt={outAt} ground={v.ground} ribbon={RIBBON_E} motifs={v.motifs}>
+				{(lf) => <HeroCard lf={lf} ink={INK[v.ground]} lines={[v.word]} measure="VALORISER" />}
+			</Win>
+		))}
+	</>
+);
+
+/* ------------------------------------------------ F — CRÉER AUJOURD'HUI UN DEMAIN PLUS BEAU */
+const RIBBON_F: Ribbon = {y0: 70, amp: 50, waves: 1.1, n: 7, gap: 9, width: 4.5, tilt: -40};
+
+export const SceneF: React.FC<SceneProps> = ({inAt, outAt}) => (
+	<>
+		<Win i={0} inAt={inAt} outAt={outAt} ground="blue" ribbon={RIBBON_F}
+			motifs={[{kind: 'tri', x: 16, y: 256, cell: 32, cols: 3, rows: 2}]}
 		>
-			{(lf) => (
-				<ProductCard lf={lf} title={'DÉCOUPE\nLASER'} ink={INK.blue} camZ={6.8} floorY={-1.0}>
-					<LaserCutRosette rotY={spinIn(lf, 0.2, 0.45, 44)} />
-				</ProductCard>
-			)}
+			{(lf) => <HeroCard lf={lf} ink={INK.blue} lines={['CRÉER']} measure="DEMAIN" />}
+		</Win>
+		<Win i={1} inAt={inAt} outAt={outAt} ground="white" ribbon={RIBBON_F}
+			motifs={[{kind: 'vstripes', x: 14, y: 262, w: 100, h: 58, n: 7, from: 'bottom'}]}
+		>
+			{(lf) => <HeroCard lf={lf} ink={INK.white} lines={["AUJOURD'HUI"]} />}
+		</Win>
+		<Win i={2} inAt={inAt} outAt={outAt} ground="red" ribbon={RIBBON_F}
+			motifs={[{kind: 'half', cx: 64, cy: 320, r: 56, rot: 0}]}
+		>
+			{(lf) => <HeroCard lf={lf} ink={INK.red} lines={['UN', 'DEMAIN']} measure="DEMAIN" />}
+		</Win>
+		<Win i={3} inAt={inAt} outAt={outAt} ground="sky" ribbon={RIBBON_F}
+			motifs={[{kind: 'arcs', cx: 0, cy: 320, r: 110, n: 5, rot: -90}]}
+		>
+			{(lf) => <HeroCard lf={lf} ink={INK.sky} lines={['PLUS']} measure="DEMAIN" />}
+		</Win>
+		<Win i={4} inAt={inAt} outAt={outAt} ground="blue" ribbon={RIBBON_F}
+			motifs={[{kind: 'quarter', cx: 128, cy: 320, r: 100, rot: 180}]}
+		>
+			{(lf) => <HeroCard lf={lf} ink={INK.blue} lines={['BEAU']} measure="DEMAIN" accentLine={0} />}
 		</Win>
 	</>
 );
@@ -133,18 +238,6 @@ const LaserWindow: React.FC<{lf: number}> = ({lf}) => {
 	);
 };
 
-const BigEye: React.FC<{lf: number}> = ({lf}) => (
-	<svg width={WIN_W} height={HEIGHT} style={{position: 'absolute', inset: 0}}>
-		<g transform={`rotate(${6 * Math.sin(lf / 45)} 64 160)`}>
-			<MotifShape
-				m={{kind: 'eye', cx: 64, cy: 160, r: 56, accent: C.red, hole: C.white, pupil: C.blue}}
-				color={C.brandNavy}
-				p={prog(lf, 6, 60, ease.soft)}
-			/>
-		</g>
-	</svg>
-);
-
 export const SceneC: React.FC<SceneProps> = ({inAt, outAt}) => (
 	<>
 		<Win i={0} inAt={inAt} outAt={outAt} ground="red" ribbon={RIBBON_C}
@@ -158,10 +251,13 @@ export const SceneC: React.FC<SceneProps> = ({inAt, outAt}) => (
 		<Win i={2} inAt={inAt} outAt={outAt} ground="white"
 			motifs={[
 				{kind: 'vstripes', x: 0, y: 0, w: 128, h: 46, n: 9},
-				{kind: 'vstripes', x: 0, y: 274, w: 128, h: 46, n: 9, from: 'bottom'},
 			]}
 		>
-			{(lf) => <BigEye lf={lf} />}
+			{(lf) => (
+				<ProductCard lf={lf} title={'DÉCOUPE\nLASER'} ink={INK.white} camZ={6.8} floorY={-1.0}>
+					<LaserCutRosette rotY={spinIn(lf, 0.2, 0.45, 44)} />
+				</ProductCard>
+			)}
 		</Win>
 		<Win i={3} inAt={inAt} outAt={outAt} ground="sky" ribbon={RIBBON_C}
 			motifs={[{kind: 'tri', x: 16, y: 256, cell: 32, cols: 3, rows: 2}]}

@@ -10,7 +10,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-FRAMES=900
+FRAMES=1560
 CHUNK=150
 SEQ=$(mktemp -d "${TMPDIR:-/tmp}/vu_frames_XXXXXX") # no dot in the name: Remotion rejects it
 trap 'rm -rf "$SEQ"' EXIT
@@ -23,12 +23,12 @@ for ((a = 0; a < FRAMES; a += CHUNK)); do
 done
 
 mkdir -p out
-npx remotion ffmpeg -y -loglevel error -framerate 30 -i "$SEQ/element-%03d.png" \
+npx remotion ffmpeg -y -loglevel error -framerate 30 -i "$SEQ/element-%04d.png" \
 	-c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p \
 	-colorspace bt709 -color_primaries bt709 -color_trc bt709 \
 	-movflags +faststart -an out/vision-urbaine.mp4
 
-npx remotion ffmpeg -y -loglevel error -framerate 30 -i "$SEQ/element-%03d.png" \
+npx remotion ffmpeg -y -loglevel error -framerate 30 -i "$SEQ/element-%04d.png" \
 	-c:v libx264 -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 \
 	-g 30 -keyint_min 30 -sc_threshold 0 -bf 0 -refs 1 \
 	-b:v 3M -maxrate 3M -bufsize 6M -x264-params nal-hrd=cbr \

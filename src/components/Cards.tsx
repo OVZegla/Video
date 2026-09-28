@@ -1,7 +1,7 @@
 import React from 'react';
 import {C, ease, FONT, HEIGHT, prog, WIN_W} from '../theme';
 import {DISPLAY} from '../fonts';
-import {RiseLetters, useFitSize} from './FitText';
+import {RiseLetters, useFitSize, useSplitFit} from './FitText';
 import {Stage} from '../three/Stage';
 
 const HERO_FONT = `800 extra-condensed {s}px ${DISPLAY}`;
@@ -168,3 +168,82 @@ export const ProductCard: React.FC<{
 /** Entry spin for products: a quarter-turn that eases into the resting angle (the back never shows). */
 export const spinIn = (lf: number, base = 0, sway = 0.25, period = 60) =>
 	base + Math.PI * 0.45 * (1 - prog(lf, 0, 64, ease.out)) + sway * Math.sin(lf / period);
+
+/**
+ * One slice of a word that spans several adjacent windows. Each window shows
+ * whole letters only, justified across its width, on the same plate colour,
+ * so the word reads as one line across the storefront.
+ */
+export const SpanHero: React.FC<{
+	lf: number;
+	word: string;
+	parts: number; // how many windows the word spans
+	part: number; // which slice this window shows
+	ink: Ink;
+	sub?: string[];
+	maxSize?: number;
+}> = ({lf, word, parts, part, ink, sub, maxSize = 92}) => {
+	const fit = useSplitFit(word, parts, HERO_FONT, WIN_W - 6, maxSize);
+	if (!fit) return null;
+	const letters = fit.groups[part].split('');
+	const plate = prog(lf, 0, 26, ease.out);
+	const rule = prog(lf, 20, 44, ease.out);
+	const subP = prog(lf, 28, 54, ease.out);
+	return (
+		<div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center'}}>
+			<div
+				style={{
+					width: WIN_W,
+					padding: '16px 0 18px',
+					background: ink.plate,
+					clipPath: `inset(0 ${(1 - plate) * 100}% 0 0)`,
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					gap: 11,
+				}}
+			>
+				<div style={{height: 4, display: 'flex', alignItems: 'center'}}>
+					{part === Math.floor(parts / 2) ? <Tricolour p={rule} mid={ink.plate === C.white ? C.sky : C.white} /> : null}
+				</div>
+				<div
+					style={{
+						width: WIN_W - 6,
+						display: 'flex',
+						justifyContent: letters.length > 1 ? 'space-between' : 'center',
+						overflow: 'hidden',
+						fontFamily: DISPLAY,
+						fontWeight: 800,
+						fontStretch: '62%',
+						fontSize: fit.size,
+						lineHeight: 0.98,
+						color: ink.text,
+					}}
+				>
+					{letters.map((ch, k) => {
+						const t = Math.max(0, Math.min(1, (lf - 6 - k * 3) / 22));
+						return (
+							<span key={k} style={{display: 'inline-block', transform: `translateY(${(1 - ease.out(t)) * 110}%)`}}>
+								{ch}
+							</span>
+						);
+					})}
+				</div>
+				<div
+					style={{
+						minHeight: 38, // same height in every slice so the letters line up across windows
+						fontFamily: FONT,
+						fontWeight: 600,
+						fontSize: 14.5,
+						lineHeight: 1.3,
+						color: ink.sub,
+						textAlign: 'center',
+						opacity: subP,
+					}}
+				>
+					{sub ? sub.map((s, k) => <div key={k}>{s}</div>) : null}
+				</div>
+			</div>
+		</div>
+	);
+};
