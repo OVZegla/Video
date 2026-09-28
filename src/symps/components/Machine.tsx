@@ -61,16 +61,38 @@ type MachineProps = {
 	style?: React.CSSProperties;
 };
 
+/** Where a machine's photo sits inside its box (contain, bottom-anchored), in px. */
+export const photoRect = (product: Product, boxHeight: number) => {
+	const photo = PRODUCT_IMAGES[product.id];
+	if (!photo) return null;
+	const bw = boxHeight * MACHINE_ASPECT;
+	const k = Math.min(bw / photo.w, boxHeight / photo.h);
+	const w = photo.w * k;
+	const h = photo.h * k;
+	return {x: (bw - w) / 2, y: boxHeight - h, w, h};
+};
+
+/** Screen offset from the box centre of a machine's (inner) mast, in px. */
+export const mastOffset = (product: Product, boxHeight: number, side: 'left' | 'right') => {
+	const r = photoRect(product, boxHeight);
+	const top = product.details?.top;
+	if (r && top) return r.x + top[0] * r.w - (boxHeight * MACHINE_ASPECT) / 2;
+	if (!product.look.dualMast) return 0;
+	const k = boxHeight / 1000;
+	const off = (300 - machineGeometry(product.look).rail.x) * k;
+	return side === 'right' ? -off : off;
+};
+
 export const Machine: React.FC<MachineProps> = ({product, height, head = 0.35, uv = 0, rim = 0, forceVector, style}) => {
 	const photo = PRODUCT_IMAGES[product.id];
 	const box: React.CSSProperties = {width: height * MACHINE_ASPECT, height, position: 'relative', ...style};
 	if (photo && !forceVector) {
+		const r = photoRect(product, height)!;
+		// the photo keeps its own shape and colours; only a soft rim light is added on dark stages
+		const glow = rim > 0 ? `drop-shadow(-1px 0 2px ${hexA(product.env.rim, 0.55 * rim)}) drop-shadow(0 0 14px ${hexA(product.env.rim, 0.12 * rim)})` : undefined;
 		return (
 			<div style={box}>
-				<Img
-					src={staticFile(photo)}
-					style={{width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom'}}
-				/>
+				<Img src={staticFile(photo.src)} style={{position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, filter: glow}} />
 			</div>
 		);
 	}
@@ -458,4 +480,8 @@ export const shade = (c: string, amt: number) => {
 	const [r, g, b] = hex(c);
 	const f = (v: number) => Math.round(amt >= 0 ? v + (255 - v) * amt : v * (1 + amt));
 	return `#${[f(r), f(g), f(b)].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+};
+export const hexA = (c: string, a: number) => {
+	const [r, g, b] = hex(c);
+	return `rgba(${r},${g},${b},${Math.max(0, Math.min(1, a)).toFixed(3)})`;
 };

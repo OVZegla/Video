@@ -61,7 +61,21 @@ export const ProductReveal: React.FC<{product: Product; duration: number; hero?:
 					/>
 				</>
 			);
-			rim = 0.25 * rev;
+			rim = 0.4 * rev;
+			// soft backlight: the dark mast reads as a silhouette against it
+			extraBack = (
+				<div
+					style={{
+						position: 'absolute',
+						left: X - 520,
+						top: floorY - h * 1.1,
+						width: 1040,
+						height: h * 1.25,
+						background: 'radial-gradient(ellipse 50% 50% at 50% 55%, rgba(110,140,190,0.22) 0%, rgba(110,140,190,0.07) 45%, rgba(0,0,0,0) 72%)',
+						opacity: prog(f, 0, 60, ease.inOut),
+					}}
+				/>
+			);
 			break;
 		}
 		case 'studioWhite': {

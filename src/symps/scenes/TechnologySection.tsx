@@ -84,14 +84,13 @@ const Word: React.FC<{text: string; dur: number; y: number}> = ({text, dur, y}) 
 	);
 };
 
-/** `product`: ideally a wide-carriage machine, whose open frame leaves room for the words. */
 export const TechnologySection: React.FC<{product: Product}> = ({product}) => {
 	const f = useCurrentFrame();
 	const dur = BEAT + 8;
 	const visuals = [
 		<NozzlePlate key="n" dur={dur} />,
-		<DetailShot key="c" product={product} focus="cartridges" zoom={6000} head={0.3} duration={dur} target={[0.5, 0.74]} drift={[-80, 0]} light={[[0.4, 0.74], [0.6, 0.74]]} lightSize={1300} rackFocus={false} />,
-		<DetailShot key="u" product={product} focus="uv" zoom={5000} head={0.3} uv={1} duration={dur} target={[0.5, 0.3]} drift={[70, 0]} light={[[0.4, 0.3], [0.6, 0.3]]} lightSize={1200} rackFocus={false} />,
+		<DetailShot key="c" product={product} focus="ink" zoom={5200} head={0.3} duration={dur} target={[0.5, 0.74]} drift={[-80, 0]} light={[[0.4, 0.74], [0.6, 0.74]]} lightSize={1300} rackFocus={false} />,
+		<DetailShot key="u" product={product} focus="head" zoom={4600} head={0.3} uv={1} duration={dur} target={[0.5, 0.3]} drift={[70, 0]} light={[[0.4, 0.3], [0.6, 0.3]]} lightSize={1200} rackFocus={false} />,
 		<CreativityWall key="w" dur={dur} />,
 	];
 	return (

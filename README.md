@@ -35,7 +35,7 @@ npm run render      # → out/vision-urbaine.mp4
 # SYMP’S — wall printer range film
 
 Premium launch film for the full Symp’s wall printer range
-(1920 × 1080, 30 fps, ~58 s, H.264, no audio).
+(1920 × 1080, 30 fps, ~63 s, H.264, no audio).
 
 ```bash
 npm install
@@ -55,8 +55,9 @@ npm run symps:render    # → out/symps-wall-printers.mp4
 | 23–34 s   | White (TMP1000) · T1000 (TPP1000) · Access · Ruby (MK02) | High-key white / industrial scale reveal / simple / deep red accent |
 | 33–42 s   | Applications | Hotel, restaurant, retail, office, home, events: the mural prints swath by swath. « Du mur blanc… » « …à l’espace qui vous ressemble. » |
 | 41–47.5 s | Technology | PRÉCISION · COULEUR · TECHNOLOGIE · CRÉATIVITÉ over macro shots |
-| 47–54 s   | Full range | All eight machines in three depth planes, lit from back to front. « Une gamme pensée pour chaque projet. » → SYMP’S |
-| 53–58 s   | Outro | Logo, light pass, « Donnez une nouvelle dimension aux murs. », fade to black |
+| 47–54 s   | Double tête Epson I1600 | The two heads (CMYK + white), then an exploded view: support white, relief, white underlayer, colour |
+| 54–60 s   | Full range | All eight machines in three depth planes, lit from back to front. « Une gamme pensée pour chaque projet. » → SYMP’S |
+| 59–63 s   | Outro | Logo, light pass, « Donnez une nouvelle dimension aux murs. », fade to black |
 
 ## Structure (`src/symps/`)
 
@@ -69,13 +70,30 @@ npm run symps:render    # → out/symps-wall-printers.mp4
 
 ## Product photos
 
-symps.fr could not be reached from the build environment, so the machines are currently drawn by a
-parametric vector render (`components/Machine.tsx`). To use the official photos:
+Each machine is shown from its real photo when `public/symps/products/<id>.png` exists; otherwise a
+placeholder vector render is drawn. Currently: **Opaline** uses the real photo; the others are still
+placeholders.
 
-1. Save each one as `public/symps/products/<id>.png` (ids: `opaline`, `m1`, `graphite`, `black-2`,
-   `white`, `t1000`, `access`, `ruby`; transparent PNG preferred, webp/jpg accepted).
-2. Optionally add project photos to `public/symps/projects/` (used in order by the application section).
-3. `npm run symps:render` — the asset scan runs first, and every photo is displayed uncropped
-   (`object-fit: contain`, bottom-anchored), whatever its aspect ratio.
+| id | Machine | Source |
+|----|---------|--------|
+| `opaline` | Opaline | Symp's |
+| `m1` | M1 | Friankor MK-01 |
+| `graphite` | Graphite Edition | — |
+| `black-2` | Black 2.0 | Tanyu TWF1000 |
+| `white` | White | Tanyu TMP-1000 |
+| `t1000` | T1000 | Tanyu TPP1000 |
+| `access` | Access | — |
+| `ruby` | Ruby | Friankor MK-02 |
+
+To add a machine:
+
+1. Put its photo in `public/symps/raw/<id>.jpg` (whole machine in frame, one machine per photo).
+2. `python3 scripts/cutout-products.py <id>` removes the background → `public/symps/products/<id>.png`
+   (or supply a transparent PNG there directly).
+3. Optionally set `details` for the machine in `data/products.ts` (where the wheel, ink caps,
+   control panel… sit on the photo, as fractions) so close-ups can use it.
+4. `npm run symps:render`. Photos are shown uncropped (`contain`, bottom-anchored), whatever their ratio.
+
+Project photos can go in `public/symps/projects/` (used in order by the application section).
 
 Fonts: Inter (SIL OFL), bundled in `public/symps/fonts/`.

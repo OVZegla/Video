@@ -10,6 +10,7 @@ import {BrandStatement} from './scenes/BrandStatement';
 import {INTRO_DURATION, Intro} from './scenes/Intro';
 import {OUTRO_DURATION, Outro} from './scenes/Outro';
 import {ProductLineup} from './scenes/ProductLineup';
+import {PRINTHEAD_DURATION, PrintheadScene} from './scenes/PrintheadScene';
 import {ProductReveal} from './scenes/ProductReveal';
 import {TECH_DURATION, TechnologySection} from './scenes/TechnologySection';
 import {ease, prog} from './theme';
@@ -25,7 +26,7 @@ import {ease, prog} from './theme';
 
 const FADE = 22;
 const HERO_DURATION = 190;
-const PRODUCT_DURATION = 112;
+const PRODUCT_DURATION = 104;
 const BRAND_DURATION = 180;
 const LINEUP_DURATION = 210;
 
@@ -53,7 +54,8 @@ const SEGMENTS: Segment[] = [
 	},
 	...secondAct.map((p, i) => productSegment(p, i === 0 ? 'fade' : 'line')),
 	{key: 'applications', dur: APPS_DURATION, enter: 'fade', render: () => <ApplicationScene />},
-	{key: 'technology', dur: TECH_DURATION, enter: 'fade', render: () => <TechnologySection product={PRODUCTS.find((p) => p.look.dualMast) ?? hero} />},
+	{key: 'technology', dur: TECH_DURATION, enter: 'fade', render: () => <TechnologySection product={hero} />},
+	{key: 'printheads', dur: PRINTHEAD_DURATION, enter: 'fade', render: () => <PrintheadScene />},
 	{key: 'lineup', dur: LINEUP_DURATION, enter: 'fade', render: () => <ProductLineup products={PRODUCTS} duration={LINEUP_DURATION} />},
 	{key: 'outro', dur: OUTRO_DURATION, enter: 'fade', render: () => <Outro />},
 ];

@@ -49,6 +49,9 @@ export interface Environment {
 	bright: boolean;
 }
 
+/** Named details of a machine, as [x, y] fractions of its photo (used for close-ups). */
+export type DetailKey = 'wheel' | 'ink' | 'panel' | 'cable' | 'screen' | 'top' | 'head' | 'connector' | 'rail';
+
 export interface Product {
 	id: string;
 	name: string;
@@ -61,6 +64,8 @@ export interface Product {
 	side: 'left' | 'right';
 	env: Environment;
 	look: MachineLook;
+	/** where the details sit on the official photo, if there is one */
+	details?: Partial<Record<DetailKey, [number, number]>>;
 }
 
 const DARK_TEXT = {text: '#F5F5F7', subText: '#8E8E93'};
@@ -76,12 +81,24 @@ export const PRODUCTS: Product[] = [
 		look: {
 			body: '#E9E7E2', bodyLight: '#FBFAF7', bodyDark: '#A9A69F',
 			rail: '#B9BDC4', railLight: '#F2F4F7', accent: '#2F7BFF',
-			finish: 'gloss', height: 0.95, baseWidth: 430, carriageWidth: 236, pearl: true, detail: 1,
+			finish: 'gloss', height: 1, baseWidth: 430, carriageWidth: 236, pearl: true, detail: 1,
+		},
+		details: {
+			wheel: [0.468, 0.955],
+			ink: [0.255, 0.735],
+			head: [0.2, 0.77],
+			panel: [0.742, 0.69],
+			cable: [0.485, 0.83],
+			connector: [0.535, 0.63],
+			screen: [0.535, 0.48],
+			top: [0.395, 0.03],
+			rail: [0.395, 0.3],
 		},
 	},
 	{
 		id: 'm1',
 		name: 'M1',
+		model: 'MK01',
 		tagline: 'La précision, simplement.',
 		side: 'left',
 		env: {mood: 'studioWhite', sky: ['#E9EAEC', '#C9CBCF'], floor: '#D5D7DA', rim: '#FFFFFF', bright: true, ...LIGHT_TEXT},
@@ -107,6 +124,7 @@ export const PRODUCTS: Product[] = [
 	{
 		id: 'black-2',
 		name: 'BLACK 2.0',
+		model: 'TWF1000',
 		tagline: 'Le noir, dans sa forme la plus pure.',
 		side: 'left',
 		env: {mood: 'edge', sky: ['#000000', '#000000'], floor: '#030304', rim: '#BFD6FF', bright: false, ...DARK_TEXT},

@@ -32,7 +32,7 @@ export const Intro: React.FC<{product: Product}> = ({product}) => {
 				<DetailShot
 					product={product}
 					focus="wheel"
-					zoom={5600}
+					zoom={4600}
 					duration={62}
 					target={[0.44, 0.58]}
 					drift={[-70, -10]}
@@ -47,7 +47,7 @@ export const Intro: React.FC<{product: Product}> = ({product}) => {
 				<DetailShot
 					product={product}
 					focus="ink"
-					zoom={4400}
+					zoom={4200}
 					head={0.3}
 					duration={64}
 					target={[0.62, 0.82]}
@@ -62,8 +62,8 @@ export const Intro: React.FC<{product: Product}> = ({product}) => {
 			<Shot from={104} dur={66} fadeOut={1}>
 				<DetailShot
 					product={product}
-					focus="uv"
-					zoom={3600}
+					focus="panel"
+					zoom={4000}
 					head={0.3}
 					uv={1}
 					duration={66}
