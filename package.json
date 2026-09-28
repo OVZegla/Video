@@ -6,9 +6,12 @@
   "scripts": {
     "studio": "remotion studio",
     "typecheck": "tsc --noEmit",
-    "render": "remotion render VisionUrbaine out/vision-urbaine.mp4 --codec=h264 --muted"
+    "render": "remotion render VisionUrbaine out/vision-urbaine.mp4 --codec=h264 --muted",
+    "symps:assets": "node scripts/scan-symps-assets.mjs",
+    "symps:render": "node scripts/scan-symps-assets.mjs && remotion render SympsWallPrinters out/symps-wall-printers.mp4 --codec=h264 --muted"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.3.0",
     "@fontsource/jost": "^5.3.0",
     "@remotion/cli": "4.0.290",
     "@remotion/fonts": "^4.0.290",
