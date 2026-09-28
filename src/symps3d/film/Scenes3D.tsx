@@ -5,6 +5,8 @@ import {Machine3D, layout, type MachineSpec} from '../kit/Machine3D';
 import {Stage3D} from '../kit/Stage3D';
 import {PrintMask, muralTexture, type MuralStyle} from '../kit/murals';
 import {flat, paint, steel} from '../kit/materials';
+import {labelTexture} from '../kit/textures';
+import {rounded} from '../kit/Machine3D';
 import {SPECS} from '../specs';
 import {RevealLine, Wordmark, fontBase} from '../../symps/components/Typography';
 import {LAYERS_DURATION, Layers} from '../../symps/scenes/PrintheadScene';
@@ -203,33 +205,61 @@ const Gallery: React.FC = () => {
 
 // ————————————————————————————————————————————— technology
 
+const headLabel = () =>
+	labelTexture('epson-label', 512, 256, (c, w, h) => {
+		c.fillStyle = '#16171A';
+		c.fillRect(0, 0, w, h);
+		c.fillStyle = '#E8E8E8';
+		c.font = "600 64px 'SympsInter', Arial";
+		c.textAlign = 'center';
+		c.fillText('EPSON', w / 2, 110);
+		c.font = "400 40px 'SympsInter', Arial";
+		c.fillStyle = '#9EA3AB';
+		c.fillText('I1600', w / 2, 180);
+	});
+
+const nozzlePlate = () =>
+	labelTexture('nozzles', 512, 256, (c, w, h) => {
+		c.fillStyle = '#A9AEB5';
+		c.fillRect(0, 0, w, h);
+		c.fillStyle = '#1A1B1E';
+		for (let r = 0; r < 4; r++) for (let i = 0; i < 64; i++) c.fillRect(20 + i * 7.4 + (r % 2) * 3.7, 50 + r * 44, 3, 3);
+	});
+
 /** Two Epson I1600 heads on their carriage plate (CMYK + white). */
 export const EpsonHeads3D: React.FC<{open?: number}> = ({open = 0}) => {
+	const label = useMemo(() => new THREE.MeshStandardMaterial({map: headLabel(), roughness: 0.5}), []);
+	const plate = useMemo(() => new THREE.MeshStandardMaterial({map: nozzlePlate(), metalness: 0.7, roughness: 0.25}), []);
 	const head = (x: number, inks: string[]) => (
 		<group position={[x, 0, 0]}>
-			<mesh material={flat('#17181B', 0.4, 0.3)} castShadow>
-				<boxGeometry args={[0.07, 0.05, 0.045]} />
+			<mesh geometry={rounded(0.07, 0.05, 0.045)} material={flat('#141518', 0.35, 0.3)} castShadow />
+			<mesh position={[0, 0.002, 0.0231]} material={label}>
+				<planeGeometry args={[0.05, 0.025]} />
 			</mesh>
-			<mesh position={[0, -0.028, 0]} material={steel()}>
-				<boxGeometry args={[0.062, 0.006, 0.04]} />
+			{/* nozzle plate, underneath */}
+			<mesh position={[0, -0.0255, 0]} rotation={[Math.PI / 2, 0, 0]} material={plate}>
+				<planeGeometry args={[0.06, 0.03]} />
 			</mesh>
-			{[-0.016, 0.016].map((z) => (
-				<mesh key={z} position={[0, 0.045, z * 0.6]} material={flat('#C9A45A', 0.35, 0.6)}>
-					<boxGeometry args={[0.05, 0.04, 0.002]} />
+			<mesh position={[0, -0.024, 0]} material={steel()}>
+				<boxGeometry args={[0.066, 0.002, 0.036]} />
+			</mesh>
+			{/* flex cables */}
+			{[-0.012, 0.012].map((z) => (
+				<mesh key={z} position={[0, 0.047, z]} material={flat('#C9A45A', 0.35, 0.6)}>
+					<boxGeometry args={[0.034, 0.045, 0.0008]} />
 				</mesh>
 			))}
+			{/* ink inlets */}
 			{inks.map((c, i) => (
-				<mesh key={i} position={[-0.024 + i * 0.016, 0.03, 0.012]} material={paint(c, 0.3)}>
-					<cylinderGeometry args={[0.005, 0.005, 0.012, 16]} />
+				<mesh key={i} position={[-0.026 + i * 0.012, 0.03, -0.014]} material={paint(c, 0.3)}>
+					<cylinderGeometry args={[0.004, 0.004, 0.012, 16]} />
 				</mesh>
 			))}
 		</group>
 	);
 	return (
 		<group>
-			<mesh position={[0, 0.03 + open * 0.08, 0]} material={paint('#1E3C9E')}>
-				<boxGeometry args={[0.22, 0.012, 0.09]} />
-			</mesh>
+			<mesh position={[0, 0.032 + open * 0.1, 0]} geometry={rounded(0.23, 0.01, 0.1)} material={paint('#1E3C9E')} />
 			{head(-0.05, ['#00A3E0', '#E4007C', '#FFD400', '#1A1A1E'])}
 			{head(0.05, ['#F4F4F2', '#F4F4F2'])}
 		</group>
@@ -271,10 +301,11 @@ export const Tech3D: React.FC = () => {
 
 const Precision: React.FC<{spec: MachineSpec}> = ({spec}) => {
 	const f = useCurrentFrame();
-	const head = lerp(0.2, 0.45, prog(f, 0, BEAT, ease.linear));
-	const n = layout(spec, {head}).nozzle;
+	const head = lerp(0.15, 0.7, prog(f, 0, BEAT, ease.inOut));
+	const L = layout(spec, {head});
+	const y = L.unitY + 0.15;
 	return (
-		<Stage3D cam={{pos: [n.x - 0.45, n.y + 0.05, n.z + lerp(0.3, -0.1, prog(f, 0, BEAT, ease.out))], target: [n.x, n.y, n.z], fov: 30}} look={{key: 1, rim: 5, env: 0.6}} reflect={false}>
+		<Stage3D cam={{pos: [L.mastX - 0.55, y + 0.12, L.mastZ + 0.62], target: [L.unitX, y, L.unitZ], fov: 34, roll: 0.04}} look={{key: 2, rim: 6, env: 0.9, cyc: ['#000', 0]}} reflect={false}>
 			<Machine3D spec={spec} state={{head, uv: 1}} />
 		</Stage3D>
 	);
@@ -365,7 +396,7 @@ export const Lineup3D: React.FC<{ids: string[]}> = ({ids}) => {
 	const target: V3 = [lerp(xs[0] + 0.4, xs[n - 1] - 1.2, truck) * (1 - rise), lerp(1.3, 1.1, rise), 0];
 	return (
 		<AbsoluteFill style={{background: '#000'}}>
-			<Stage3D cam={{pos, target, fov: lerp(40, 40, rise)}} look={{key: 2.2, rim: 5, pool: [6, 0.18]}}>
+			<Stage3D cam={{pos, target, fov: 40}} look={{key: 2.2, rim: 5, pool: [7, 0.2], cyc: ['#000', 0]}}>
 				{ids.map((id, i) => (
 					<group key={id} position={[xs[i], 0, (i % 2) * -0.6]} rotation={[0, 0.35, 0]}>
 						<Machine3D spec={SPECS[id]} state={{head: 0.45 + 0.4 * Math.sin(f * 0.09 - i * 0.8), uv: 0.6}} />

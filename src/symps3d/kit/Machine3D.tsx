@@ -58,6 +58,7 @@ export type MachineState = {
 };
 
 const geoCache = new Map<string, THREE.BufferGeometry>();
+export const rounded = (w: number, h: number, d: number, r = 0.004) => rbox(w, h, d, r);
 const rbox = (w: number, h: number, d: number, r = 0.01) => {
 	const k = `rb-${w.toFixed(4)}-${h.toFixed(4)}-${d.toFixed(4)}-${r}`;
 	if (!geoCache.has(k)) geoCache.set(k, new RoundedBoxGeometry(w, h, d, 3, Math.min(r, w / 2.2, h / 2.2, d / 2.2)));

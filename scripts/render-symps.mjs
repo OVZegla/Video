@@ -4,13 +4,14 @@ import {execFileSync, spawnSync} from 'node:child_process';
 import {mkdirSync, rmSync, writeFileSync, existsSync} from 'node:fs';
 import {join, resolve} from 'node:path';
 
-const COMP = 'SympsWallPrinters';
-const OUT = 'out/symps-wall-printers.mp4';
+// usage: node scripts/render-symps.mjs [composition] [output]
+const COMP = process.argv[2] ?? 'Symps3D';
+const OUT = process.argv[3] ?? 'out/symps-wall-printers.mp4';
 const CHUNK = 300;
-const TMP = 'out/.symps-chunks';
+const TMP = `out/.symps-chunks-${COMP}`;
 
 const info = execFileSync('npx', ['remotion', 'compositions'], {encoding: 'utf8'});
-const line = info.split('\n').find((l) => l.startsWith(COMP));
+const line = info.split('\n').find((l) => l.split(/\s+/)[0] === COMP);
 const total = Number(line.match(/(\d+) \(/)[1]);
 mkdirSync(TMP, {recursive: true});
 
@@ -22,7 +23,7 @@ for (let start = 0; start < total; start += CHUNK) {
 	if (existsSync(file)) continue;
 	for (let attempt = 1; ; attempt++) {
 		console.log(`frames ${start}-${end} (attempt ${attempt})`);
-		const r = spawnSync('npx', ['remotion', 'render', COMP, file, `--frames=${start}-${end}`, '--log=error'], {stdio: 'inherit'});
+		const r = spawnSync('npx', ['remotion', 'render', COMP, file, `--frames=${start}-${end}`], {stdio: 'inherit'});
 		if (r.status === 0) break;
 		if (attempt === 4) throw new Error(`chunk ${start}-${end} failed`);
 	}
