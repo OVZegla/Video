@@ -32,7 +32,44 @@ npm run render      # → out/vision-urbaine.mp4
 
 ---
 
-# SYMP’S — wall printer range film
+# SYMP’S — wall printer range film (3D)
+
+Launch film for the Symp's wall printer range, built in **3D** with Remotion + Three.js
+(1920 × 1080, 30 fps, ~69 s, H.264, no audio). The machines are real-time 3D models that
+roll, turn, assemble, deploy their mast and print.
+
+```bash
+npm install
+npm run studio          # composition "Symps3D"
+npm run symps:render    # → out/symps-wall-printers.mp4  (chunked, retried, software WebGL)
+npm run symps:render:2d # the earlier 2D version → out/symps-wall-printers-2d.mp4
+```
+
+## Film (composition `Symps3D`, `src/symps3d/`)
+
+| Section | What moves |
+|---------|------------|
+| Intro | Hard-cut macros: camera gliding up the mast, a rolling wheel, the ink caps; pull-back reveal. « SYMP’S », « L’impression murale. Réinventée. » |
+| Opaline | Exploded parts fly together while the camera circles, the mast deploys, full turn on the turntable while the print unit runs up and down |
+| Range | M1, Graphite Edition, Black 2.0, White, T1000, Access, Ruby: each drives in, spins, or is revealed by an orbit or a crane move, with whip-pans between shots |
+| Brand moment | Four machines on a turning platform, camera climbing away. « Une gamme. » « Plusieurs façons de créer. » « Une seule vision. » |
+| Printing | The Opaline prints a wall swath by swath (head up and down the mast, machine stepping along the wall), then a glide along finished walls: hôtellerie, art mural (a real Symp's print), restauration, commerce, habitat, bureaux |
+| Technology | PRÉCISION · COULEUR · TECHNOLOGIE · CRÉATIVITÉ on 3D macros |
+| Epson I1600 | The two heads (CMYK + white), then the exploded layers: support white, relief, white underlayer, colour |
+| Lineup | The eight machines in a row, camera trucking along then rising. « Une gamme pensée pour chaque projet. » → SYMP’S |
+| Outro | Logo, light pass, « Donnez une nouvelle dimension aux murs. » |
+
+- `kit/Machine3D.tsx`: parametric machine (wheels, chassis, cabinet, steel strip, control panel, mast profiles, print unit with ink caps, coiled cable, screen arm) + its animation state (head, mast, wheels, exploded view)
+- `specs.ts`: one spec per machine. **Opaline** is modelled from photos of the real machine; the others are modelled from the machines visible in the showroom photos and must be checked against the real products.
+- `kit/Stage3D.tsx`: studio (softbox reflections, rim lights, glossy floor with mirror reflection, curved backdrop)
+- `film/*`: the shots; `SympsFilm3D.tsx`: the timeline.
+
+Rendering uses software WebGL (`swangle`) because the render machine has no GPU (~4 s/frame).
+
+---
+
+# SYMP’S — wall printer range film (2D, previous version)
+
 
 Premium launch film for the full Symp’s wall printer range
 (1920 × 1080, 30 fps, ~63 s, H.264, no audio).

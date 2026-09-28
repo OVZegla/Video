@@ -23,7 +23,7 @@ for (let start = 0; start < total; start += CHUNK) {
 	if (existsSync(file)) continue;
 	for (let attempt = 1; ; attempt++) {
 		console.log(`frames ${start}-${end} (attempt ${attempt})`);
-		const r = spawnSync('npx', ['remotion', 'render', COMP, file, `--frames=${start}-${end}`], {stdio: 'inherit'});
+		const r = spawnSync('npx', ['remotion', 'render', COMP, file, `--frames=${start}-${end}`, '--concurrency=4'], {stdio: 'inherit'});
 		if (r.status === 0) break;
 		if (attempt === 4) throw new Error(`chunk ${start}-${end} failed`);
 	}

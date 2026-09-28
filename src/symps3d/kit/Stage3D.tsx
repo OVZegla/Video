@@ -3,6 +3,10 @@ import {ThreeCanvas} from '@remotion/three';
 import {useThree} from '@react-three/fiber';
 import * as THREE from 'three';
 
+// Software WebGL cost switches (the render farm here has no GPU).
+const SHADOWS = false;
+const AA = true;
+
 export type Cam = {pos: [number, number, number]; target: [number, number, number]; fov?: number; roll?: number};
 
 /** Places the camera every frame (the film drives it, not the user). */
@@ -121,8 +125,8 @@ export const Stage3D: React.FC<{cam: Cam; look?: Look; children: React.ReactNode
 			width={1920}
 			height={1080}
 			style={{background}}
-			shadows
-			gl={{antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: exposure}}
+			shadows={SHADOWS}
+			gl={{antialias: AA, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: exposure}}
 			camera={{fov: cam.fov ?? 30, near: 0.02, far: 200}}
 		>
 			<CameraRig cam={cam} />
