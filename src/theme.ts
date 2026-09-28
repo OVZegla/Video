@@ -22,6 +22,9 @@ export const C = {
 	wood: '#B7773E',
 	woodDark: '#8A5328',
 	woodLight: '#D39A5E',
+	// official brand colours, sampled from the logo file
+	brandNavy: '#00044F',
+	brandRed: '#FF0508',
 } as const;
 
 export const FONT = 'Jost';

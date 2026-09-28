@@ -5,13 +5,14 @@ import {Layer, Reveal} from '../components/primitives';
 
 const LOGO_W = 500;
 
-/** Outline-only type: stroked layer under a black-filled copy (hides inner contours). */
+/** Outlined type as on the wall sign: white letters with a navy contour. */
 const Outlined: React.FC<{text: string}> = ({text}) => (
 	<span style={{display: 'inline-grid', fontWeight: 500}}>
-		<span style={{gridArea: '1 / 1', color: C.white, WebkitTextStroke: `2.4px ${C.white}`}}>{text}</span>
-		<span style={{gridArea: '1 / 1', color: C.black}}>{text}</span>
+		<span style={{gridArea: '1 / 1', color: C.brandNavy, WebkitTextStroke: `2.4px ${C.brandNavy}`}}>{text}</span>
+		<span style={{gridArea: '1 / 1', color: C.white}}>{text}</span>
 	</span>
 );
+
 const LOGO_H = LOGO_W / LOGO_RATIO;
 export const LOGO_CY = 146;
 const LOGO_TOP = LOGO_CY - LOGO_H / 2;
@@ -103,9 +104,9 @@ export const LogoScene: React.FC<{p: number}> = ({p}) => {
 						gap: '0.3em',
 					}}
 				>
-					<span style={{fontWeight: 700, color: C.white}}>Pensé à Béthune</span>
+					<span style={{fontWeight: 700, color: C.brandNavy}}>Pensé à Béthune</span>
 					<Outlined text="et ouvert sur" />
-					<span style={{fontWeight: 700, color: C.red}}>le monde</span>
+					<span style={{fontWeight: 700, color: C.brandRed}}>le monde</span>
 				</div>
 			</Reveal>
 		</Layer>

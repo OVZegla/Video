@@ -2,8 +2,8 @@ import React from 'react';
 import {Img, staticFile} from 'remotion';
 import {C} from '../theme';
 
-/** Official Vision Urbaine logo, recoloured for LED (navy → white, transparent ground). */
-export const LOGO_SRC = staticFile('brand/vision-urbaine-logo-led.png');
+/** Official Vision Urbaine logo, original colours on a transparent ground. */
+export const LOGO_SRC = staticFile('brand/vision-urbaine-logo.png');
 export const LOGO_RATIO = 1940 / 223;
 
 export const LogoImage: React.FC<{width: number}> = ({width}) => (

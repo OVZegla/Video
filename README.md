@@ -27,5 +27,5 @@ npm run render      # → out/vision-urbaine.mp4
 - `src/VisionUrbaine.tsx`: main composition and timeline
 - `src/scenes/*`: one file per scene
 - `src/components/Products.tsx`: SVG product illustrations
-- `public/brand/vision-urbaine-logo-led.png`: official logo recoloured for LED (navy → white, transparent)
+- `public/brand/vision-urbaine-logo.png`: official logo, original colours (transparent ground)
 - `public/fonts/`: Jost (SIL OFL), bundled so renders are offline
