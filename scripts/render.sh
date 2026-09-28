@@ -12,7 +12,7 @@ cd "$(dirname "$0")/.."
 
 FRAMES=900
 CHUNK=150
-SEQ=$(mktemp -d)
+SEQ=$(mktemp -d "${TMPDIR:-/tmp}/vu_frames_XXXXXX") # no dot in the name: Remotion rejects it
 trap 'rm -rf "$SEQ"' EXIT
 
 for ((a = 0; a < FRAMES; a += CHUNK)); do

@@ -157,6 +157,6 @@ export const ProductCard: React.FC<{
 	);
 };
 
-/** Entry spin for products: a half-turn that eases into the resting angle. */
+/** Entry spin for products: a quarter-turn that eases into the resting angle (the back never shows). */
 export const spinIn = (lf: number, base = 0, sway = 0.25, period = 60) =>
-	base + Math.PI * 0.9 * (1 - prog(lf, 0, 64, ease.out)) + sway * Math.sin(lf / period);
+	base + Math.PI * 0.45 * (1 - prog(lf, 0, 64, ease.out)) + sway * Math.sin(lf / period);
