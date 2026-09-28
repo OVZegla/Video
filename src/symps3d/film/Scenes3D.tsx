@@ -396,10 +396,10 @@ export const Lineup3D: React.FC<{ids: string[]}> = ({ids}) => {
 	const target: V3 = [lerp(xs[0] + 0.4, xs[n - 1] - 1.2, truck) * (1 - rise), lerp(1.3, 1.1, rise), 0];
 	return (
 		<AbsoluteFill style={{background: '#000'}}>
-			<Stage3D cam={{pos, target, fov: 40}} look={{key: 2.2, rim: 5, pool: [7, 0.2], cyc: ['#000', 0]}}>
+			<Stage3D cam={{pos, target, fov: 40}} look={{key: 2.2, rim: 5, pool: [7, 0.2], cyc: ['#000', 0], mirror: 0}} reflect={false}>
 				{ids.map((id, i) => (
 					<group key={id} position={[xs[i], 0, (i % 2) * -0.6]} rotation={[0, 0.35, 0]}>
-						<Machine3D spec={SPECS[id]} state={{head: 0.45 + 0.4 * Math.sin(f * 0.09 - i * 0.8), uv: 0.6}} />
+						<Machine3D spec={SPECS[id]} state={{head: 0.45 + 0.4 * Math.sin(f * 0.09 - i * 0.8), uv: 0.6}} low />
 					</group>
 				))}
 			</Stage3D>

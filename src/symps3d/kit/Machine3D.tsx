@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {createContext, useContext, useMemo} from 'react';
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import {INK_CAPS, alloy, anodised, emissive, flat, glassScreen, paint, plasticBlack, plasticWhite, rubber, steel} from './materials';
@@ -57,6 +57,9 @@ export type MachineState = {
 	uv?: number;
 };
 
+/** Low detail: small parts are skipped (wide shots with many machines, software WebGL). */
+const LowDetail = createContext(false);
+
 const geoCache = new Map<string, THREE.BufferGeometry>();
 export const rounded = (w: number, h: number, d: number, r = 0.004) => rbox(w, h, d, r);
 const rbox = (w: number, h: number, d: number, r = 0.01) => {
@@ -79,6 +82,7 @@ const Cyl: React.FC<{r: number; h: number; pos?: [number, number, number]; rot?:
 
 export const Wheel: React.FC<{r: number; style: 'alloy' | 'black'; spin: number; side: 1 | -1}> = ({r, style, spin, side}) => {
 	const w = r * 0.62;
+	const low = useContext(LowDetail);
 	return (
 		<group rotation={[spin, 0, 0]}>
 			{/* tyre */}
@@ -89,7 +93,7 @@ export const Wheel: React.FC<{r: number; style: 'alloy' | 'black'; spin: number;
 			{/* rim */}
 			<group position={[(side * w) / 2 + side * 0.001, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
 				<Cyl r={r * 0.7} h={0.008} mat={style === 'alloy' ? alloy() : plasticBlack()} seg={40} />
-				{Array.from({length: 5}).map((_, i) => {
+				{!low && Array.from({length: 5}).map((_, i) => {
 					const a = (i / 5) * Math.PI * 2;
 					return (
 						<mesh key={i} position={[Math.cos(a) * r * 0.4, -side * 0.0045, Math.sin(a) * r * 0.4]} rotation={[0, -a, 0]} scale={[1.5, 1, 0.8]} material={flat('#0A0A0B', 0.6)}>
@@ -106,6 +110,7 @@ export const Wheel: React.FC<{r: number; style: 'alloy' | 'black'; spin: number;
 // ——————————————————————————————————————————————— mast
 
 const Mast: React.FC<{spec: MachineSpec; height: number; x: number; z: number}> = ({spec, height, x, z}) => {
+	const low = useContext(LowDetail);
 	const m = anodised(spec.rail);
 	const slot = flat(spec.rail === 'black' ? '#050506' : '#7D838B', 0.5, 0.6);
 	const prof = 0.042;
@@ -116,10 +121,10 @@ const Mast: React.FC<{spec: MachineSpec; height: number; x: number; z: number}> 
 				<group key={i} position={[i === 1 && spec.rails === 3 ? 0.03 : 0, height / 2, oz]}>
 					<Box size={[prof, height, prof]} mat={m} r={0.003} />
 					{/* T-slots */}
-					{[-1, 1].map((s) => (
+					{!low && [-1, 1].map((s) => (
 						<Box key={s} size={[0.006, height - 0.02, 0.008]} pos={[(s * prof) / 2, 0, 0]} mat={slot} r={0.001} />
 					))}
-					<Box size={[0.008, height - 0.02, 0.006]} pos={[0, 0, prof / 2]} mat={slot} r={0.001} />
+					{!low && <Box size={[0.008, height - 0.02, 0.006]} pos={[0, 0, prof / 2]} mat={slot} r={0.001} />}
 				</group>
 			))}
 			{/* top: pulley + knob */}
@@ -129,7 +134,7 @@ const Mast: React.FC<{spec: MachineSpec; height: number; x: number; z: number}> 
 				<Cyl r={0.014} h={0.03} pos={[0.035, 0.0, 0]} rot={[0, 0, Math.PI / 2]} mat={plasticBlack()} />
 			</group>
 			{/* clamp brackets with knobs */}
-			{[0.55, 0.72].map((p) => (
+			{!low && [0.55, 0.72].map((p) => (
 				<group key={p} position={[0, height * p, 0]}>
 					<Box size={[0.056, 0.05, 0.06 + (spec.rails - 1) * 0.046]} mat={anodised('black')} r={0.004} />
 					<Cyl r={0.012} h={0.03} pos={[0.04, 0, 0]} rot={[0, 0, Math.PI / 2]} mat={plasticBlack()} />
@@ -154,6 +159,7 @@ const Mast: React.FC<{spec: MachineSpec; height: number; x: number; z: number}> 
 // ——————————————————————————————————————————————— print unit
 
 export const PrintUnit: React.FC<{spec: MachineSpec; uv: number}> = ({spec, uv}) => {
+	const low = useContext(LowDetail);
 	const body = paint(spec.unit ?? spec.body);
 	const dark = flat('#0C0C0E', 0.5);
 	const lcd = useMemo(() => new THREE.MeshBasicMaterial({map: lcdTexture(), toneMapped: false}), []);
@@ -162,7 +168,7 @@ export const PrintUnit: React.FC<{spec: MachineSpec; uv: number}> = ({spec, uv})
 			{/* lower housing */}
 			<Box size={[0.3, 0.2, 0.32]} pos={[0, 0.1, 0]} mat={body} r={0.01} />
 			{/* vents on +z */}
-			{[0, 1, 2].map((i) => (
+			{!low && [0, 1, 2].map((i) => (
 				<Box key={i} size={[0.12, 0.012, 0.004]} pos={[0.04, 0.05 + i * 0.022, 0.161]} mat={dark} r={0.002} />
 			))}
 			{/* LCD */}
@@ -186,14 +192,14 @@ export const PrintUnit: React.FC<{spec: MachineSpec; uv: number}> = ({spec, uv})
 					</group>
 				))}
 				{/* serrated edge */}
-				{Array.from({length: 10}).map((_, i) => (
+				{!low && Array.from({length: 10}).map((_, i) => (
 					<Box key={i} size={[0.004, 0.01, 0.012]} pos={[0.062, 0.02, -0.11 + i * 0.024]} mat={dark} r={0.001} />
 				))}
 			</group>
 			{/* sensor (yellow) */}
 			<Cyl r={0.011} h={0.07} pos={[-0.06, 0.225, 0.13]} rot={[0, 0, Math.PI / 2]} mat={paint('#F2B600', 0.35)} />
 			{/* drive pulley */}
-			<Cyl r={0.06} h={0.02} pos={[0.13, 0.12, -0.17]} rot={[Math.PI / 2, 0, 0]} mat={flat('#8C9096', 0.35, 0.8)} />
+			{!low && <Cyl r={0.06} h={0.02} pos={[0.13, 0.12, -0.17]} rot={[Math.PI / 2, 0, 0]} mat={flat('#8C9096', 0.35, 0.8)} />}
 			{spec.fan && (
 				<group position={[0.1, 0.1, 0.162]}>
 					<Cyl r={0.04} h={0.004} rot={[Math.PI / 2, 0, 0]} mat={dark} />
@@ -229,15 +235,26 @@ const coilGeometry = (a: THREE.Vector3, b: THREE.Vector3) => {
 	return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), N, 0.0055, 6, false);
 };
 
+// Coil geometries are shared (mirror reflections, several machines, successive
+// frames): endpoints are snapped to 2 cm so a moving head reuses them.
+const coilCache = new Map<string, THREE.BufferGeometry>();
+const snap = (v: THREE.Vector3) => new THREE.Vector3(Math.round(v.x * 50) / 50, Math.round(v.y * 50) / 50, Math.round(v.z * 50) / 50);
+
 const Coil: React.FC<{from: THREE.Vector3; to: THREE.Vector3}> = ({from, to}) => {
-	const key = `${from.toArray().map((v) => v.toFixed(2))}-${to.toArray().map((v) => v.toFixed(2))}`;
-	const geo = useMemo(() => coilGeometry(from, to), [key]); // eslint-disable-line react-hooks/exhaustive-deps
-	return <mesh geometry={geo} material={flat('#0D0D0F', 0.35, 0.2)} castShadow />;
+	const a = snap(from);
+	const b = snap(to);
+	const key = `${a.toArray()}|${b.toArray()}`;
+	if (!coilCache.has(key)) {
+		if (coilCache.size > 600) coilCache.clear();
+		coilCache.set(key, coilGeometry(a, b));
+	}
+	return <mesh geometry={coilCache.get(key)!} material={flat('#0D0D0F', 0.35, 0.2)} castShadow />;
 };
 
 // ——————————————————————————————————————————————— cabinet
 
 const Cabinet: React.FC<{spec: MachineSpec}> = ({spec}) => {
+	const low = useContext(LowDetail);
 	const t = spec.tower!;
 	const body = paint(spec.cabinet ?? spec.body);
 	const plateMat = useMemo(() => (spec.plate ? new THREE.MeshStandardMaterial({map: modelPlate(spec.plate), roughness: 0.4}) : null), [spec.plate]);
@@ -251,7 +268,7 @@ const Cabinet: React.FC<{spec: MachineSpec}> = ({spec}) => {
 			{spec.steelStrip && (
 				<group position={[t.w / 2 - 0.07, t.h / 2, t.d / 2 + 0.003]}>
 					<Box size={[0.13, t.h - 0.02, 0.006]} mat={steel()} r={0.002} />
-					{[-0.05, -0.043].map((x) => (
+					{!low && [-0.05, -0.043].map((x) => (
 						<Box key={x} size={[0.003, t.h - 0.1, 0.002]} pos={[x, 0, 0.004]} mat={paint('#B0122A')} r={0.0008} />
 					))}
 					<Box size={[0.003, t.h * 0.35, 0.002]} pos={[0.045, -t.h * 0.25, 0.004]} mat={paint('#B0122A')} r={0.0008} />
@@ -349,7 +366,7 @@ export const layout = (spec: MachineSpec, state: MachineState = {}) => {
 	};
 };
 
-export const Machine3D: React.FC<{spec: MachineSpec; state?: MachineState}> = ({spec, state = {}}) => {
+export const Machine3D: React.FC<{spec: MachineSpec; state?: MachineState; low?: boolean}> = ({spec, state = {}, low = false}) => {
 	const {spin = 0, explode = 0, uv = 0} = state;
 	const {cw, cd, r, deckY, t, towerX, towerZ, mastX, mastZ, mastH, unitX, unitY, unitZ} = layout(spec, state);
 	const e = explode;
@@ -358,6 +375,7 @@ export const Machine3D: React.FC<{spec: MachineSpec; state?: MachineState}> = ({
 	const unitTop = new THREE.Vector3(unitX + 0.1 - e * 0.45, unitY + 0.2 + e * 0.05, unitZ + 0.1);
 
 	return (
+		<LowDetail.Provider value={low}>
 		<group>
 			{/* wheels */}
 			{[
@@ -400,5 +418,6 @@ export const Machine3D: React.FC<{spec: MachineSpec; state?: MachineState}> = ({
 				</group>
 			)}
 		</group>
+		</LowDetail.Provider>
 	);
 };
