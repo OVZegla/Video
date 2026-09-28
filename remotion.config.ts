@@ -8,3 +8,4 @@ Config.setCrf(16);
 Config.setColorSpace('bt709');
 Config.setOverwriteOutput(true);
 Config.setDelayRenderTimeoutInMilliseconds(120000);
+Config.setChromiumOpenGlRenderer('swangle');

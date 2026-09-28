@@ -189,7 +189,9 @@ const LAYERS = [
 	{key: 'color', label: 'Couleur', note: 'La quadrichromie CMJN, par-dessus.'},
 ] as const;
 
-const Layers: React.FC = () => {
+/** Exploded view of the printed layers; plays for LAYERS_DURATION frames. */
+export const LAYERS_DURATION = PRINTHEAD_DURATION - (HEADS_END - 8);
+export const Layers: React.FC = () => {
 	const lf = useCurrentFrame(); // relative to the Sequence
 	const D = PRINTHEAD_DURATION - (HEADS_END - 8);
 	const arrive = (i: number) => prog(lf, 6 + i * 14, 34 + i * 14, ease.out);
