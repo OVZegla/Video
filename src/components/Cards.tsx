@@ -6,105 +6,111 @@ import {Stage} from '../three/Stage';
 
 const HERO_FONT = `800 extra-condensed {s}px ${DISPLAY}`;
 
-export const Tricolour: React.FC<{p: number; width?: number; height?: number}> = ({p, width = 54, height = 4}) => (
+export const Tricolour: React.FC<{p: number; width?: number; height?: number; mid?: string}> = ({p, width = 54, height = 4, mid = C.white}) => (
 	<div style={{display: 'flex', width, height, transform: `scaleX(${p})`}}>
 		<div style={{flex: 1, background: C.blue}} />
-		<div style={{flex: 1, background: C.white}} />
+		<div style={{flex: 1, background: mid}} />
 		<div style={{flex: 1, background: C.red}} />
 	</div>
 );
 
+export type Ink = {text: string; sub: string; accent: string; plate: string};
+
 /**
  * A typographic window: one word (or one word split over lines) sized to fill
- * the window width in condensed Archivo, a tricolour rule and a subtitle.
+ * the window width in condensed Archivo, on a solid plate that masks the
+ * patterns behind it, with a tricolour rule and a subtitle.
  */
 export const HeroCard: React.FC<{
 	lf: number;
 	lines: string[];
+	ink: Ink;
 	sub?: string[];
 	maxSize?: number;
-	color?: string;
-	accentLine?: number; // index of a line drawn in light blue
+	accentLine?: number; // index of a line drawn in the accent colour
 	measure?: string; // size as if the longest line were this (to match neighbours)
-}> = ({lf, lines, sub, maxSize = 96, color = C.white, accentLine, measure}) => {
+}> = ({lf, lines, ink, sub, maxSize = 96, accentLine, measure}) => {
 	const longest = measure ?? lines.reduce((a, b) => (b.length > a.length ? b : a));
-	const size = useFitSize(longest, HERO_FONT, WIN_W - 10, maxSize, 0.01);
+	const size = useFitSize(longest, HERO_FONT, WIN_W - 14, maxSize, 0.01);
 	if (!size) return null;
+	const plate = prog(lf, 0, 26, ease.out);
 	const rule = prog(lf, 20, 44, ease.out);
 	const subP = prog(lf, 28, 54, ease.out);
-	// a slow "breath" so the type stays alive while it is read
 	const breathe = 1 + 0.018 * Math.sin(lf / 38);
 	return (
-		<div
-			style={{
-				position: 'absolute',
-				inset: 0,
-				display: 'flex',
-				flexDirection: 'column',
-				alignItems: 'center',
-				justifyContent: 'center',
-				gap: 12,
-			}}
-		>
-			<Tricolour p={rule} />
-			<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', transform: `scale(${breathe})`}}>
-				{lines.map((line, k) => (
-					<RiseLetters
-						key={k}
-						text={line}
-						lf={lf}
-						start={6 + k * 8}
-						ease={ease.out}
-						stagger={2}
-						dur={20}
-						style={{
-							fontFamily: DISPLAY,
-							fontWeight: 800,
-							fontStretch: '62%',
-							fontSize: size,
-							lineHeight: 0.98,
-							letterSpacing: '0.01em',
-							color: k === accentLine ? C.sky : color,
-						}}
-					/>
-				))}
-			</div>
-			{sub ? (
-				<div
-					style={{
-						fontFamily: FONT,
-						fontWeight: 500,
-						fontSize: 14.5,
-						lineHeight: 1.3,
-						color: C.ice,
-						textAlign: 'center',
-						opacity: subP,
-						transform: `translateY(${(1 - subP) * 10}px)`,
-					}}
-				>
-					{sub.map((s, k) => (
-						<div key={k}>{s}</div>
+		<div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center'}}>
+			<div
+				style={{
+					width: WIN_W,
+					padding: '16px 0 18px',
+					background: ink.plate,
+					clipPath: `inset(0 ${(1 - plate) * 100}% 0 0)`,
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					gap: 11,
+				}}
+			>
+				<Tricolour p={rule} mid={ink.plate === C.white ? C.sky : C.white} />
+				<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', transform: `scale(${breathe})`}}>
+					{lines.map((line, k) => (
+						<RiseLetters
+							key={k}
+							text={line}
+							lf={lf}
+							start={6 + k * 8}
+							ease={ease.out}
+							stagger={2}
+							dur={20}
+							style={{
+								fontFamily: DISPLAY,
+								fontWeight: 800,
+								fontStretch: '62%',
+								fontSize: size,
+								lineHeight: 0.98,
+								letterSpacing: '0.01em',
+								color: k === accentLine ? ink.accent : ink.text,
+							}}
+						/>
 					))}
 				</div>
-			) : null}
+				{sub ? (
+					<div
+						style={{
+							fontFamily: FONT,
+							fontWeight: 600,
+							fontSize: 14.5,
+							lineHeight: 1.3,
+							color: ink.sub,
+							textAlign: 'center',
+							opacity: subP,
+							transform: `translateY(${(1 - subP) * 10}px)`,
+						}}
+					>
+						{sub.map((s, k) => (
+							<div key={k}>{s}</div>
+						))}
+					</div>
+				) : null}
+			</div>
 		</div>
 	);
 };
 
 /**
- * A product window: a large photographic 3D stage and a caption.
- * The product arrives with a half-turn and settles; the camera keeps a slow orbit.
+ * A product window: a large photographic 3D stage and a caption on a plate.
+ * The product arrives with a quarter-turn and settles; the camera keeps a slow orbit.
  */
 export const ProductCard: React.FC<{
 	lf: number;
 	title: string;
-	accent: string;
+	ink: Ink;
 	camZ?: number;
 	camY?: number;
 	lookY?: number;
 	floorY?: number;
 	children: React.ReactNode;
-}> = ({lf, title, accent, camZ = 7, camY = 1.0, lookY = -0.1, floorY, children}) => {
+}> = ({lf, title, ink, camZ = 7, camY = 1.0, lookY = -0.1, floorY, children}) => {
 	const cap = prog(lf, 22, 46, ease.out);
 	const settle = prog(lf, 0, 46, ease.out);
 	const orbit = 0.16 * Math.sin(lf / 70);
@@ -113,7 +119,7 @@ export const ProductCard: React.FC<{
 			<div
 				style={{
 					position: 'absolute',
-					top: 4,
+					top: 2,
 					left: 0,
 					transform: `translateY(${(1 - settle) * 26}px) scale(${0.86 + 0.14 * settle})`,
 				}}
@@ -125,28 +131,30 @@ export const ProductCard: React.FC<{
 			<div
 				style={{
 					position: 'absolute',
-					top: HEIGHT - 70,
+					top: HEIGHT - 72,
 					left: 0,
 					width: WIN_W,
+					height: 60,
+					background: ink.plate,
+					clipPath: `inset(0 ${(1 - cap) * 100}% 0 0)`,
 					display: 'flex',
 					flexDirection: 'column',
 					alignItems: 'center',
-					gap: 7,
+					justifyContent: 'center',
+					gap: 6,
 				}}
 			>
-				<div style={{width: 30 * cap, height: 3, background: accent}} />
+				<div style={{width: 30 * cap, height: 3, background: ink.accent}} />
 				<div
 					style={{
 						fontFamily: DISPLAY,
-						fontWeight: 700,
+						fontWeight: 800,
 						fontStretch: '62%',
 						fontSize: 19,
 						letterSpacing: '0.05em',
-						color: C.white,
+						color: ink.text,
 						textAlign: 'center',
-						lineHeight: 1.08,
-						opacity: cap,
-						transform: `translateY(${(1 - cap) * 8}px)`,
+						lineHeight: 1.05,
 						whiteSpace: 'pre-line',
 					}}
 				>
