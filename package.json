@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit",
     "render": "remotion render VisionUrbaine out/vision-urbaine.mp4 --codec=h264 --muted",
     "symps:assets": "node scripts/scan-symps-assets.mjs",
-    "symps:render": "node scripts/scan-symps-assets.mjs && remotion render SympsWallPrinters out/symps-wall-printers.mp4 --codec=h264 --muted"
+    "symps:render": "node scripts/scan-symps-assets.mjs && node scripts/render-symps.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
