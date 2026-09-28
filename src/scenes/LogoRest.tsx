@@ -2,41 +2,40 @@ import React from 'react';
 import {Img, staticFile, useCurrentFrame} from 'remotion';
 import {C, DURATION, ease, FONT, prog, WIN_W} from '../theme';
 import {Card} from '../components/Card';
+import {Tricolour} from '../components/Cards';
 
-const VISION = {src: staticFile('brand/logo-vision.png'), w: 844, h: 223};
-const URBAINE = {src: staticFile('brand/logo-urbaine.png'), w: 1031, h: 223};
-const SCALE = (WIN_W - 16) / URBAINE.w; // "Urbaine" fills the window; "Vision" shares its scale
+// Logo recoloured for the LED: navy → white, blue pupil and red sector kept.
+const VISION = {src: staticFile('brand/logo-vision-white.png'), w: 844, h: 223};
+const URBAINE = {src: staticFile('brand/logo-urbaine-white.png'), w: 1031, h: 223};
+const SCALE = (WIN_W - 6) / URBAINE.w; // "Urbaine" fills the window; "Vision" shares its scale
 
-/** Outlined type as on the wall sign: white letters with a navy contour. */
+/** Outline-only type (as on the wall sign), white contour. */
 const Outlined: React.FC<{text: string}> = ({text}) => (
 	<span style={{display: 'inline-grid', fontWeight: 500}}>
-		<span style={{gridArea: '1 / 1', color: C.brandNavy, WebkitTextStroke: `2.2px ${C.brandNavy}`}}>{text}</span>
-		<span style={{gridArea: '1 / 1', color: C.white}}>{text}</span>
+		<span style={{gridArea: '1 / 1', color: C.white, WebkitTextStroke: `2.4px ${C.white}`}}>{text}</span>
+		<span style={{gridArea: '1 / 1', color: C.black}}>{text}</span>
 	</span>
 );
 
-/** The logo stacked to fit a single window, with the tagline beneath it. */
+/** The logo stacked to fit one window, tagline beneath. */
 const Lockup: React.FC<{lf: number}> = ({lf}) => {
-	const logo = prog(lf, 4, 34, ease.out);
-	const tag = (k: number) => prog(lf, 24 + k * 6, 44 + k * 6, ease.out);
-	const line: React.CSSProperties = {fontFamily: FONT, fontSize: 13.5, lineHeight: 1.3, whiteSpace: 'nowrap'};
+	const v = prog(lf, 2, 30, ease.out);
+	const u = prog(lf, 8, 36, ease.out);
+	const bar = prog(lf, 20, 44, ease.out);
+	const tag = (k: number) => prog(lf, 26 + k * 6, 48 + k * 6, ease.out);
+	const line: React.CSSProperties = {fontFamily: FONT, fontSize: 15, lineHeight: 1.28, whiteSpace: 'nowrap'};
 	return (
-		<div
-			style={{
-				position: 'absolute',
-				inset: 0,
-				display: 'flex',
-				flexDirection: 'column',
-				alignItems: 'center',
-				justifyContent: 'center',
-			}}
-		>
-			<div style={{opacity: logo, transform: `translateY(${(1 - logo) * 10}px)`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4}}>
-				<Img src={VISION.src} style={{width: VISION.w * SCALE, height: VISION.h * SCALE}} />
-				<Img src={URBAINE.src} style={{width: URBAINE.w * SCALE, height: URBAINE.h * SCALE}} />
+		<div style={{position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+			<div style={{overflow: 'hidden'}}>
+				<Img src={VISION.src} style={{display: 'block', width: VISION.w * SCALE, height: VISION.h * SCALE, transform: `translateY(${(1 - v) * 105}%)`}} />
+			</div>
+			<div style={{overflow: 'hidden', marginTop: 5}}>
+				<Img src={URBAINE.src} style={{display: 'block', width: URBAINE.w * SCALE, height: URBAINE.h * SCALE, transform: `translateY(${(1 - u) * 105}%)`}} />
 			</div>
 			<div style={{height: 16}} />
-			<div style={{...line, fontWeight: 700, color: C.brandNavy, opacity: tag(0)}}>Pensé à Béthune</div>
+			<Tricolour p={bar} width={60} />
+			<div style={{height: 14}} />
+			<div style={{...line, fontWeight: 700, color: C.white, opacity: tag(0)}}>Pensé à Béthune</div>
 			<div style={{...line, opacity: tag(1)}}>
 				<Outlined text="et ouvert sur" />
 			</div>
@@ -47,34 +46,40 @@ const Lockup: React.FC<{lf: number}> = ({lf}) => {
 
 /**
  * The rest pose that opens and closes the loop:
- * blue disc (window 1) · logo lockup (window 3) · red square (window 5).
- * Settled content never depends on `lf`, so frame 900 ≡ frame 0.
+ * blue disc + light-blue orbit (W1) · logo lockup (W3) · red square (W5).
+ * `offset` = the Sequence's start, so periodic motion uses global time
+ * and frame 900 ≡ frame 0.
  */
-export const LogoRest: React.FC<{inAt: number; outAt: number; offset: number}> = ({inAt, outAt, offset}) => {
-	const frame = useCurrentFrame();
-	// a quarter-turn per loop: a square looks identical at 0° and 90°
-	const squareRot = ((frame + offset) / DURATION) * 90; // offset = the Sequence's start → global time
+export const LogoRest: React.FC<{inAt: number | null; outAt: number | null; offset: number}> = ({inAt, outAt, offset}) => {
+	const g = useCurrentFrame() + offset;
+	const turn = (g / DURATION) * Math.PI * 2; // one full revolution per loop
+	const squareRot = (g / DURATION) * 90; // a square looks identical at 0° and 90°
 	return (
 		<>
-			<Card i={0} inAt={inAt} outAt={outAt} accent={C.blue}>
+			<Card i={0} inAt={inAt} outAt={outAt}>
 				{(lf) => {
-					const s = prog(lf, 6, 40, ease.out);
+					const s = prog(lf, 4, 40, ease.out);
+					const ox = Math.cos(turn * 2) * 44;
+					const oy = Math.sin(turn * 2) * 44;
 					return (
 						<div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-							<div style={{width: 64, height: 64, borderRadius: '50%', background: C.blue, transform: `scale(${s})`}} />
+							<div style={{position: 'absolute', width: 88, height: 88, borderRadius: '50%', border: `2px solid ${C.sky}`, transform: `scale(${s})`}} />
+							<div style={{width: 70, height: 70, borderRadius: '50%', background: C.blue, transform: `scale(${s})`}} />
+							<div style={{position: 'absolute', width: 12, height: 12, borderRadius: '50%', background: C.white, transform: `translate(${ox * s}px, ${oy * s}px)`}} />
 						</div>
 					);
 				}}
 			</Card>
-			<Card i={2} inAt={inAt - 2 * 6 + 6} outAt={outAt - 2 * 6 + 6} accent={C.white}>
+			<Card i={2} inAt={inAt} outAt={outAt}>
 				{(lf) => <Lockup lf={lf} />}
 			</Card>
-			<Card i={4} inAt={inAt - 4 * 6 + 12} outAt={outAt - 4 * 6 + 12} accent={C.red}>
+			<Card i={4} inAt={inAt} outAt={outAt}>
 				{(lf) => {
-					const s = prog(lf, 6, 40, ease.out);
+					const s = prog(lf, 4, 40, ease.out);
 					return (
 						<div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-							<div style={{width: 50, height: 50, background: C.red, transform: `scale(${s}) rotate(${squareRot}deg)`}} />
+							<div style={{position: 'absolute', width: 84, height: 84, border: `2px solid ${C.ice}`, transform: `scale(${s}) rotate(${-squareRot}deg)`}} />
+							<div style={{width: 58, height: 58, background: C.red, transform: `scale(${s}) rotate(${squareRot}deg)`}} />
 						</div>
 					);
 				}}

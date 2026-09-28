@@ -1,41 +1,31 @@
 import React from 'react';
 import {AbsoluteFill, Sequence, useCurrentFrame} from 'remotion';
 import {C, DURATION, WIN_COUNT, WIN_W, winX} from './theme';
-import {STAGGER, WIPE} from './components/Card';
+import {Rails, SweepBand} from './components/Sweep';
 import {LogoRest} from './scenes/LogoRest';
 import {SceneA, SceneB, SceneC} from './scenes/Scenes';
 
 /**
  * 30 s seamless loop for 5 separate LED windows (128 × 320 each).
  *
- * Rule of the piece: every word and every object lives inside ONE window.
- * The physical gaps between panels (door, counter opening, mullions) can
- * never cut a letter. Scenes change window by window with a vertical wipe
- * that travels left → right across the storefront.
+ * Every word and every product lives inside ONE window, so the physical gaps
+ * between panels never cut a letter. What travels across the windows is
+ * graphic only: the tricolour band that changes the scenes, and Bauhaus lines.
  *
- *   0 ─ 100   logo at rest (continues from the end of the loop), then wipes out
- * 100 ─ 350   IMAGINEZ · plexi imprimé · objets personnalisés · bois gravé · plexi lumineux
- * 350 ─ 600   plaques pro · enseignes · PERSONNALISEZ · décors imprimés · découpe laser
- * 600 ─ 820   CRÉEZ · fabriqué à Béthune (laser live) · l'œil · SANS · LIMITES
- * 820 ─ 900   logo wipes back in and holds — frame 900 ≡ frame 0
+ *   0 ─  90   logo at rest (continues from the end of the loop)
+ *  90         band → IMAGINEZ · plexi imprimé · mug · bois gravé · plexi lumineux
+ * 330         band → plaques · enseignes · PERSONNALISEZ · décors · découpe laser
+ * 570         band → CRÉEZ · fabriqué à Béthune (laser) · l'œil · SANS · LIMITES
+ * 800         band → logo, settles and holds — frame 900 ≡ frame 0
  */
-const T = {
-	logoOut: 70,
-	a: [100, 320] as const,
-	b: [350, 570] as const,
-	c: [600, 790] as const,
-	logoIn: 820,
-};
+const S = [90, 330, 570, 800] as const;
 
-// How long a scene stays mounted after its exit starts (last window + wipe).
-const TAIL = STAGGER * (WIN_COUNT - 1) + WIPE + 2;
-
-/** Registration ticks in each window's corners — a quiet, constant frame. */
+/** Registration ticks in each window's corners. */
 const WindowTicks: React.FC = () => {
 	const frame = useCurrentFrame();
-	const breathe = 0.16 + 0.06 * Math.sin((frame / DURATION) * Math.PI * 2 * 3);
+	const o = 0.2 + 0.08 * Math.sin((frame / DURATION) * Math.PI * 2 * 3);
 	const L = 7;
-	const m = 6;
+	const m = 5;
 	return (
 		<AbsoluteFill>
 			{Array.from({length: WIN_COUNT}, (_, i) =>
@@ -46,8 +36,8 @@ const WindowTicks: React.FC = () => {
 					[WIN_W - m, 320 - m, -1, -1],
 				].map(([x, y, sx, sy], k) => (
 					<React.Fragment key={`${i}-${k}`}>
-						<div style={{position: 'absolute', left: winX(i) + x + (sx < 0 ? -L : 0), top: y, width: L, height: 1, background: C.white, opacity: breathe}} />
-						<div style={{position: 'absolute', left: winX(i) + x, top: y + (sy < 0 ? -L : 0), width: 1, height: L, background: C.white, opacity: breathe}} />
+						<div style={{position: 'absolute', left: winX(i) + x + (sx < 0 ? -L : 0), top: y, width: L, height: 1, background: C.ice, opacity: o}} />
+						<div style={{position: 'absolute', left: winX(i) + x, top: y + (sy < 0 ? -L : 0), width: 1, height: L, background: C.ice, opacity: o}} />
 					</React.Fragment>
 				)),
 			)}
@@ -55,30 +45,29 @@ const WindowTicks: React.FC = () => {
 	);
 };
 
-const scene = (inAt: number, outAt: number) => ({from: inAt, durationInFrames: outAt + TAIL - inAt});
-
 export const VisionUrbaine: React.FC = () => (
 	<AbsoluteFill style={{backgroundColor: C.black}}>
 		<WindowTicks />
+		<Rails />
 
-		<Sequence durationInFrames={T.logoOut + TAIL} name="Logo — repos (début)" layout="none">
-			<LogoRest inAt={-1000} outAt={T.logoOut} offset={0} />
+		<Sequence name="Logo (début)" layout="none">
+			<LogoRest inAt={null} outAt={S[0]} offset={0} />
+		</Sequence>
+		<Sequence name="A — IMAGINEZ" layout="none">
+			<SceneA inAt={S[0]} outAt={S[1]} />
+		</Sequence>
+		<Sequence name="B — PERSONNALISEZ" layout="none">
+			<SceneB inAt={S[1]} outAt={S[2]} />
+		</Sequence>
+		<Sequence name="C — CRÉEZ / SANS LIMITES" layout="none">
+			<SceneC inAt={S[2]} outAt={S[3]} />
+		</Sequence>
+		<Sequence name="Logo (fin)" layout="none">
+			<LogoRest inAt={S[3]} outAt={null} offset={0} />
 		</Sequence>
 
-		<Sequence {...scene(...T.a)} name="A — IMAGINEZ">
-			<SceneA inAt={0} outAt={T.a[1] - T.a[0]} />
-		</Sequence>
-
-		<Sequence {...scene(...T.b)} name="B — PERSONNALISEZ">
-			<SceneB inAt={0} outAt={T.b[1] - T.b[0]} />
-		</Sequence>
-
-		<Sequence {...scene(...T.c)} name="C — CRÉEZ / SANS LIMITES">
-			<SceneC inAt={0} outAt={T.c[1] - T.c[0]} />
-		</Sequence>
-
-		<Sequence from={T.logoIn} name="Logo — repos (fin)" layout="none">
-			<LogoRest inAt={0} outAt={100000} offset={T.logoIn} />
-		</Sequence>
+		{S.map((s) => (
+			<SweepBand key={s} at={s} />
+		))}
 	</AbsoluteFill>
 );

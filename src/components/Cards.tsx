@@ -6,8 +6,8 @@ import {Stage} from '../three/Stage';
 
 const HERO_FONT = `800 extra-condensed {s}px ${DISPLAY}`;
 
-export const Tricolour: React.FC<{p: number; width?: number}> = ({p, width = 42}) => (
-	<div style={{display: 'flex', width, height: 3, transform: `scaleX(${p})`}}>
+export const Tricolour: React.FC<{p: number; width?: number; height?: number}> = ({p, width = 54, height = 4}) => (
+	<div style={{display: 'flex', width, height, transform: `scaleX(${p})`}}>
 		<div style={{flex: 1, background: C.blue}} />
 		<div style={{flex: 1, background: C.white}} />
 		<div style={{flex: 1, background: C.red}} />
@@ -15,21 +15,25 @@ export const Tricolour: React.FC<{p: number; width?: number}> = ({p, width = 42}
 );
 
 /**
- * A typographic window: one word, sized to fill the window width
- * (condensed Archivo), a tricolour rule and a two-line subtitle.
+ * A typographic window: one word (or one word split over lines) sized to fill
+ * the window width in condensed Archivo, a tricolour rule and a subtitle.
  */
 export const HeroCard: React.FC<{
 	lf: number;
-	word: string;
-	sub?: [string, string];
+	lines: string[];
+	sub?: string[];
 	maxSize?: number;
 	color?: string;
-	measure?: string; // size the word as if it were this one (to match neighbours)
-}> = ({lf, word, sub, maxSize = 76, color = C.white, measure}) => {
-	const size = useFitSize(measure ?? word, HERO_FONT, WIN_W - 18, maxSize, 0.01);
+	accentLine?: number; // index of a line drawn in light blue
+	measure?: string; // size as if the longest line were this (to match neighbours)
+}> = ({lf, lines, sub, maxSize = 96, color = C.white, accentLine, measure}) => {
+	const longest = measure ?? lines.reduce((a, b) => (b.length > a.length ? b : a));
+	const size = useFitSize(longest, HERO_FONT, WIN_W - 10, maxSize, 0.01);
 	if (!size) return null;
-	const rule = prog(lf, 22, 44, ease.out);
-	const subP = prog(lf, 30, 52, ease.out);
+	const rule = prog(lf, 20, 44, ease.out);
+	const subP = prog(lf, 28, 54, ease.out);
+	// a slow "breath" so the type stays alive while it is read
+	const breathe = 1 + 0.018 * Math.sin(lf / 38);
 	return (
 		<div
 			style={{
@@ -43,37 +47,44 @@ export const HeroCard: React.FC<{
 			}}
 		>
 			<Tricolour p={rule} />
-			<RiseLetters
-				text={word}
-				lf={lf}
-				start={8}
-				ease={ease.out}
-				style={{
-					fontFamily: DISPLAY,
-					fontWeight: 800,
-					fontStretch: '62%',
-					fontSize: size,
-					lineHeight: 1.02,
-					letterSpacing: '0.01em',
-					color,
-				}}
-			/>
+			<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', transform: `scale(${breathe})`}}>
+				{lines.map((line, k) => (
+					<RiseLetters
+						key={k}
+						text={line}
+						lf={lf}
+						start={6 + k * 8}
+						ease={ease.out}
+						stagger={2}
+						dur={20}
+						style={{
+							fontFamily: DISPLAY,
+							fontWeight: 800,
+							fontStretch: '62%',
+							fontSize: size,
+							lineHeight: 0.98,
+							letterSpacing: '0.01em',
+							color: k === accentLine ? C.sky : color,
+						}}
+					/>
+				))}
+			</div>
 			{sub ? (
 				<div
 					style={{
 						fontFamily: FONT,
 						fontWeight: 500,
-						fontSize: 12.5,
-						lineHeight: 1.35,
-						color: C.white,
+						fontSize: 14.5,
+						lineHeight: 1.3,
+						color: C.ice,
 						textAlign: 'center',
 						opacity: subP,
-						transform: `translateY(${(1 - subP) * 8}px)`,
+						transform: `translateY(${(1 - subP) * 10}px)`,
 					}}
 				>
-					{sub[0]}
-					<br />
-					{sub[1]}
+					{sub.map((s, k) => (
+						<div key={k}>{s}</div>
+					))}
 				</div>
 			) : null}
 		</div>
@@ -81,78 +92,71 @@ export const HeroCard: React.FC<{
 };
 
 /**
- * A product window: a small photographic 3D stage and a caption.
+ * A product window: a large photographic 3D stage and a caption.
+ * The product arrives with a half-turn and settles; the camera keeps a slow orbit.
  */
 export const ProductCard: React.FC<{
 	lf: number;
 	title: string;
-	subtitle?: string;
 	accent: string;
 	camZ?: number;
 	camY?: number;
+	lookY?: number;
+	floorY?: number;
 	children: React.ReactNode;
-}> = ({lf, title, subtitle, accent, camZ = 6.2, camY = 0.8, children}) => {
-	const cap = prog(lf, 26, 48, ease.out);
-	const settle = prog(lf, 0, 50, ease.out);
+}> = ({lf, title, accent, camZ = 7, camY = 1.0, lookY = -0.1, floorY, children}) => {
+	const cap = prog(lf, 22, 46, ease.out);
+	const settle = prog(lf, 0, 46, ease.out);
+	const orbit = 0.16 * Math.sin(lf / 70);
 	return (
 		<>
 			<div
 				style={{
 					position: 'absolute',
-					top: 14,
+					top: 4,
 					left: 0,
-					transform: `translateY(${(1 - settle) * 18}px) scale(${0.92 + 0.08 * settle})`,
+					transform: `translateY(${(1 - settle) * 26}px) scale(${0.86 + 0.14 * settle})`,
 				}}
 			>
-				<Stage width={WIN_W} height={220} camZ={camZ} camY={camY}>
+				<Stage width={WIN_W} height={244} camZ={camZ - 0.25 * Math.sin(lf / 90)} camY={camY} lookY={lookY} orbit={orbit} floorY={floorY}>
 					{children}
 				</Stage>
 			</div>
 			<div
 				style={{
 					position: 'absolute',
-					top: HEIGHT - 76,
+					top: HEIGHT - 70,
 					left: 0,
 					width: WIN_W,
 					display: 'flex',
 					flexDirection: 'column',
 					alignItems: 'center',
-					gap: 6,
+					gap: 7,
 				}}
 			>
-				<div style={{width: 22 * cap, height: 2, background: accent}} />
+				<div style={{width: 30 * cap, height: 3, background: accent}} />
 				<div
 					style={{
 						fontFamily: DISPLAY,
 						fontWeight: 700,
-						fontStretch: '75%',
-						fontSize: 16,
-						letterSpacing: '0.08em',
+						fontStretch: '62%',
+						fontSize: 19,
+						letterSpacing: '0.05em',
 						color: C.white,
 						textAlign: 'center',
-						lineHeight: 1.15,
+						lineHeight: 1.08,
 						opacity: cap,
-						transform: `translateY(${(1 - cap) * 6}px)`,
+						transform: `translateY(${(1 - cap) * 8}px)`,
 						whiteSpace: 'pre-line',
 					}}
 				>
 					{title}
 				</div>
-				{subtitle ? (
-					<div
-						style={{
-							fontFamily: FONT,
-							fontWeight: 400,
-							fontSize: 11,
-							color: C.white,
-							opacity: 0.8 * cap,
-							textAlign: 'center',
-						}}
-					>
-						{subtitle}
-					</div>
-				) : null}
 			</div>
 		</>
 	);
 };
+
+/** Entry spin for products: a half-turn that eases into the resting angle. */
+export const spinIn = (lf: number, base = 0, sway = 0.25, period = 60) =>
+	base + Math.PI * 0.9 * (1 - prog(lf, 0, 64, ease.out)) + sway * Math.sin(lf / period);

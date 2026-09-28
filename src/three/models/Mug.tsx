@@ -61,7 +61,7 @@ export const Mug: React.FC<{rotY: number; name?: string}> = ({rotY, name = 'Léa
 	const lathe = useMemo(() => new LatheGeometry(profile(), 96), []);
 	const print = usePrint(name);
 	return (
-		<group rotation={[0.12, rotY, 0]}>
+		<group rotation={[0, rotY, 0]}>
 			<mesh geometry={lathe}>
 				<meshPhysicalMaterial color="#f7f7f4" roughness={0.16} clearcoat={1} clearcoatRoughness={0.05} side={DoubleSide} />
 			</mesh>

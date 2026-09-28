@@ -6,7 +6,7 @@
   "scripts": {
     "studio": "remotion studio",
     "typecheck": "tsc --noEmit",
-    "render": "remotion render VisionUrbaine out/vision-urbaine.mp4 --codec=h264 --muted"
+    "render": "scripts/render.sh"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

@@ -17,6 +17,8 @@ export const C = {
 	white: '#F6F5F0',
 	blue: '#2451FF',
 	blueDeep: '#0B2FD6',
+	sky: '#4FA3FF', // lighter blues for lines and accents
+	ice: '#A9D2FF',
 	red: '#F2352B',
 	grey: '#3A3A3A',
 	wood: '#B7773E',
