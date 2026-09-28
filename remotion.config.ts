@@ -7,3 +7,5 @@ Config.setPixelFormat('yuv420p');
 Config.setCrf(16);
 Config.setColorSpace('bt709');
 Config.setOverwriteOutput(true);
+// 3D product stages (WebGL) can be slow on machines without a GPU.
+Config.setDelayRenderTimeoutInMilliseconds(120000);

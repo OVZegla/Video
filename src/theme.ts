@@ -4,7 +4,7 @@ import {Easing, interpolate} from 'remotion';
 export const WIDTH = 640;
 export const HEIGHT = 320;
 export const FPS = 30;
-export const DURATION = 450; // 15 s — frame 450 ≡ frame 0 (seamless loop)
+export const DURATION = 900; // 30 s — frame 900 ≡ frame 0 (seamless loop)
 
 export const WIN_W = 128;
 export const WIN_COUNT = 5;

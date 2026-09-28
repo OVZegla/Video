@@ -1,41 +1,38 @@
 import React from 'react';
 import {AbsoluteFill, Sequence, useCurrentFrame} from 'remotion';
-import {C, DURATION, ease, prog, WIN_COUNT, WIN_W, winX} from './theme';
-import {LogoScene} from './scenes/LogoScene';
-import {Imaginez, IMAGINEZ_LEN} from './scenes/Imaginez';
-import {Materials, MATERIALS_LEN} from './scenes/Materials';
-import {Personnalisez, PERSONNALISEZ_LEN} from './scenes/Personnalisez';
-import {Creez, CREEZ_LEN} from './scenes/Creez';
-import {SansLimites, SANS_LIMITES_LEN} from './scenes/SansLimites';
+import {C, DURATION, WIN_COUNT, WIN_W, winX} from './theme';
+import {STAGGER, WIPE} from './components/Card';
+import {LogoRest} from './scenes/LogoRest';
+import {SceneA, SceneB, SceneC} from './scenes/Scenes';
 
 /**
- * Timeline (30 fps, 450 frames, seamless):
+ * 30 s seamless loop for 5 separate LED windows (128 × 320 each).
  *
- *   0 ─ 58   logo at rest → folds back into the centre
- *  50 ─ 142  IMAGINEZ
- * 130 ─ 234  product conveyor (acrylic, engraving, wood, objects, sign)
- * 224 ─ 308  PERSONNALISEZ
- * 296 ─ 382  CRÉEZ + laser / decor / plaque / signage
- * 368 ─ 428  SANS LIMITES → line collapses to the centre
- * 420 ─ 450  logo re-emerges from the centre and settles
+ * Rule of the piece: every word and every object lives inside ONE window.
+ * The physical gaps between panels (door, counter opening, mullions) can
+ * never cut a letter. Scenes change window by window with a vertical wipe
+ * that travels left → right across the storefront.
  *
- * The logo's exit is the time-mirror of its entry, and frame 450 lands on
- * the exact pose of frame 0, so the loop has no seam.
+ *   0 ─ 100   logo at rest (continues from the end of the loop), then wipes out
+ * 100 ─ 350   IMAGINEZ · plexi imprimé · objets personnalisés · bois gravé · plexi lumineux
+ * 350 ─ 600   plaques pro · enseignes · PERSONNALISEZ · décors imprimés · découpe laser
+ * 600 ─ 820   CRÉEZ · fabriqué à Béthune (laser live) · l'œil · SANS · LIMITES
+ * 820 ─ 900   logo wipes back in and holds — frame 900 ≡ frame 0
  */
 const T = {
-	logoOut: [30, 58] as const,
-	imaginez: 50,
-	materials: 130,
-	personnalisez: 224,
-	creez: 296,
-	sansLimites: 368,
-	logoIn: [420, 446] as const,
+	logoOut: 70,
+	a: [100, 320] as const,
+	b: [350, 570] as const,
+	c: [600, 790] as const,
+	logoIn: 820,
 };
+
+// How long a scene stays mounted after its exit starts (last window + wipe).
+const TAIL = STAGGER * (WIN_COUNT - 1) + WIPE + 2;
 
 /** Registration ticks in each window's corners — a quiet, constant frame. */
 const WindowTicks: React.FC = () => {
 	const frame = useCurrentFrame();
-	// periodic over the full loop so it never jumps at the seam
 	const breathe = 0.16 + 0.06 * Math.sin((frame / DURATION) * Math.PI * 2 * 3);
 	const L = 7;
 	const m = 6;
@@ -49,28 +46,8 @@ const WindowTicks: React.FC = () => {
 					[WIN_W - m, 320 - m, -1, -1],
 				].map(([x, y, sx, sy], k) => (
 					<React.Fragment key={`${i}-${k}`}>
-						<div
-							style={{
-								position: 'absolute',
-								left: winX(i) + x + (sx < 0 ? -L : 0),
-								top: y,
-								width: L,
-								height: 1,
-								background: C.white,
-								opacity: breathe,
-							}}
-						/>
-						<div
-							style={{
-								position: 'absolute',
-								left: winX(i) + x,
-								top: y + (sy < 0 ? -L : 0),
-								width: 1,
-								height: L,
-								background: C.white,
-								opacity: breathe,
-							}}
-						/>
+						<div style={{position: 'absolute', left: winX(i) + x + (sx < 0 ? -L : 0), top: y, width: L, height: 1, background: C.white, opacity: breathe}} />
+						<div style={{position: 'absolute', left: winX(i) + x, top: y + (sy < 0 ? -L : 0), width: 1, height: L, background: C.white, opacity: breathe}} />
 					</React.Fragment>
 				)),
 			)}
@@ -78,42 +55,30 @@ const WindowTicks: React.FC = () => {
 	);
 };
 
-export const VisionUrbaine: React.FC = () => {
-	const frame = useCurrentFrame();
-	const logoOut = 1 - prog(frame, T.logoOut[0], T.logoOut[1], ease.inOut);
-	const logoIn = prog(frame, T.logoIn[0], T.logoIn[1], ease.inOut);
+const scene = (inAt: number, outAt: number) => ({from: inAt, durationInFrames: outAt + TAIL - inAt});
 
-	return (
-		<AbsoluteFill style={{backgroundColor: C.black}}>
-			<WindowTicks />
+export const VisionUrbaine: React.FC = () => (
+	<AbsoluteFill style={{backgroundColor: C.black}}>
+		<WindowTicks />
 
-			<Sequence durationInFrames={T.logoOut[1]} name="Logo — exit">
-				<LogoScene p={logoOut} />
-			</Sequence>
+		<Sequence durationInFrames={T.logoOut + TAIL} name="Logo — repos (début)" layout="none">
+			<LogoRest inAt={-1000} outAt={T.logoOut} offset={0} />
+		</Sequence>
 
-			<Sequence from={T.imaginez} durationInFrames={IMAGINEZ_LEN} name="IMAGINEZ">
-				<Imaginez />
-			</Sequence>
+		<Sequence {...scene(...T.a)} name="A — IMAGINEZ">
+			<SceneA inAt={0} outAt={T.a[1] - T.a[0]} />
+		</Sequence>
 
-			<Sequence from={T.materials} durationInFrames={MATERIALS_LEN} name="Matériaux">
-				<Materials />
-			</Sequence>
+		<Sequence {...scene(...T.b)} name="B — PERSONNALISEZ">
+			<SceneB inAt={0} outAt={T.b[1] - T.b[0]} />
+		</Sequence>
 
-			<Sequence from={T.personnalisez} durationInFrames={PERSONNALISEZ_LEN} name="PERSONNALISEZ">
-				<Personnalisez />
-			</Sequence>
+		<Sequence {...scene(...T.c)} name="C — CRÉEZ / SANS LIMITES">
+			<SceneC inAt={0} outAt={T.c[1] - T.c[0]} />
+		</Sequence>
 
-			<Sequence from={T.creez} durationInFrames={CREEZ_LEN} name="CRÉEZ">
-				<Creez />
-			</Sequence>
-
-			<Sequence from={T.sansLimites} durationInFrames={SANS_LIMITES_LEN} name="SANS LIMITES">
-				<SansLimites />
-			</Sequence>
-
-			<Sequence from={T.logoIn[0]} name="Logo — entry">
-				<LogoScene p={logoIn} />
-			</Sequence>
-		</AbsoluteFill>
-	);
-};
+		<Sequence from={T.logoIn} name="Logo — repos (fin)" layout="none">
+			<LogoRest inAt={0} outAt={100000} offset={T.logoIn} />
+		</Sequence>
+	</AbsoluteFill>
+);
