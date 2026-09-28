@@ -41,6 +41,8 @@ export const Stage: React.FC<{
 		width={width}
 		height={height}
 		dpr={2}
+		// render only when React props change (i.e. once per video frame), never in a free-running loop
+		frameloop="demand"
 		gl={{antialias: true, alpha: true, preserveDrawingBuffer: true}}
 		camera={{fov, position: [0, camY, camZ], near: 0.1, far: 100}}
 		onCreated={({gl, camera}) => {
