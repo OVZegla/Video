@@ -14,7 +14,7 @@ npm run render      # → out/vision-urbaine.mp4
 
 | Frames  | Scene |
 |---------|-------|
-| 0–58    | Logo at rest, folds into the centre |
+| 0–58    | Logo + tagline « Pensé à Béthune et ouvert sur le monde », folds into the centre |
 | 50–142  | **IMAGINEZ**: the word assembled from five window panes |
 | 130–234 | Product conveyor: printed acrylic, engraved acrylic, wood, personalised objects, blade sign |
 | 224–308 | **PERSONNALISEZ**: the word takes a different finish in each window |
