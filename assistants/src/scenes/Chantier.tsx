@@ -278,7 +278,7 @@ const Panel: React.FC<{t: number}> = ({t}) => {
 	if (p <= 0) return null;
 	const status: [string, 'neutral' | 'wait' | 'ok'][] = [
 		['Classée', 'neutral'],
-		['À vérifier', 'wait'],
+		['À valider', 'wait'],
 		['Proposée', 'ok'],
 		['À relire', 'wait'],
 	];

@@ -78,7 +78,7 @@ export const Brief: React.FC = () => {
 					/>
 				</div>
 
-				{/* ———— veille, second plane */}
+				{/* ———— accounting note, second plane */}
 				{(() => {
 					const v = prog(t, 122, 146, E.out);
 					return (
@@ -102,14 +102,14 @@ export const Brief: React.FC = () => {
 								fontFamily: FONT_UI,
 							}}
 						>
-							<RoleTile role="pilotage" size={42} dark />
+							<RoleTile role="compta" size={42} dark />
 							<div>
 								<Kicker size={13} color={C.snow3}>
-									Veille
+									Aide comptable
 								</Kicker>
-								<div style={{fontSize: 19, fontWeight: 600, color: C.snow2, marginTop: 4}}>Pluie annoncée jeudi</div>
+								<div style={{fontSize: 19, fontWeight: 600, color: C.snow2, marginTop: 4}}>Un paiement reçu ce matin</div>
 							</div>
-							<Icon name="cloud" size={30} color={C.snow3} style={{marginLeft: 'auto'}} />
+							<Icon name="check" size={28} color={C.snow3} style={{marginLeft: 'auto'}} />
 						</div>
 					);
 				})()}
@@ -144,7 +144,7 @@ export const Brief: React.FC = () => {
 							opacity: prog(t, 6, 20),
 						}}
 					>
-						<RoleTag role="pilotage" dark size={17} />
+						<RoleTag role="secretaire" dark size={17} />
 						<div style={{display: 'flex', alignItems: 'center', gap: 10, fontSize: 17, color: C.snow3, fontWeight: 540}}>
 							<Icon name="sun" size={20} color="#C7951A" /> Mardi 29 septembre · 08:00
 						</div>

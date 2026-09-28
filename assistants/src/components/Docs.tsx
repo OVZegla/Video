@@ -100,13 +100,13 @@ export const DocNote: React.FC = () => (
 );
 
 export const DocInvoice: React.FC = () => (
-	<Frame role="commercial" status="À vérifier" tone="wait" icon="eye">
-		<Title>Éléments de facturation</Title>
-		<div style={{fontSize: 14.5, color: C.ink3, marginTop: 6}}>Client : Mme Martin · selon devis accepté</div>
+	<Frame role="compta" status="À valider" tone="wait" icon="eye">
+		<Title>Facture de solde</Title>
+		<div style={{fontSize: 14.5, color: C.ink3, marginTop: 6}}>Mme Martin · format électronique</div>
 		<div style={{marginTop: 12}}>
-			<Row k="Pose de la terrasse" v="1 forfait" />
-			<Row k="Lames et lambourdes" v="selon devis" />
-			<Row k="Acompte reçu" v="à déduire" />
+			<Row k="Travaux" v="selon devis accepté" />
+			<Row k="Acompte déjà réglé" v="déduit" />
+			<Row k="Relance si retard" v="programmée" />
 		</div>
 	</Frame>
 );
@@ -189,7 +189,7 @@ export const DocPost: React.FC = () => (
 
 export const DOCS: {role: RoleId; title: string; C: React.FC}[] = [
 	{role: 'secretaire', title: 'Note d’intervention', C: DocNote},
-	{role: 'commercial', title: 'Éléments de facturation', C: DocInvoice},
+	{role: 'compta', title: 'Facture de solde', C: DocInvoice},
 	{role: 'web', title: 'Fiche de réalisation', C: DocWeb},
 	{role: 'com', title: 'Visuel de publication', C: DocPost},
 ];

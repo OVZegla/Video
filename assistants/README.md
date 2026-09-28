@@ -34,8 +34,8 @@ ligne, indiquer un navigateur local avec `REMOTION_BROWSER=/chemin/vers/chrome`.
 | 00–07 s | 0–210     | Surcharge (`scenes/Team.tsx`)   | clair  | 11 demandes arrivent de plus en plus vite et resserrent le cadre ; arrêt net ; elles s'écartent et libèrent le centre |
 | 07–14 s | 210–420   | L'équipe se forme (`Team.tsx`)  | clair  | Un point bleu devient le dossier commun ; chaque demande rejoint l'assistant concerné et se transforme en carte de rôle ; des tâches circulent d'un assistant à l'autre via le dossier |
 | 14–26 s | 420–780   | Demande vocale (`Voice.tsx`)    | sombre | La carte Stock devient le téléphone ; question vocale → fiche produit (5 en stock · 2 réservés · **3 disponibles**) → brouillon fournisseur **« Brouillon prêt à vérifier »**, rien n'est commandé |
-| 26–40 s | 780–1200  | Chantier (`Chantier.tsx`)       | clair  | Transition en cercle depuis le statut ; photo + note vocale rejoignent le dossier « Chantier Tilleuls » ; il alimente 4 livrables (note, facturation, fiche web, visuel) qui se rangent dans un écran de validation |
-| 40–49 s | 1200–1470 | Point du jour (`Brief.tsx`)     | sombre | Le panneau de validation « devient la nuit » ; carte du matin, trois décisions en attente, veille en second plan |
+| 26–40 s | 780–1200  | Chantier (`Chantier.tsx`)       | clair  | Transition en cercle depuis le statut ; photo + note vocale rejoignent le dossier « Chantier Tilleuls » ; il alimente 4 livrables (note d’intervention de la secrétaire, facture de solde de l’aide comptable, fiche réalisation du webmaster, visuel de la communication) qui se rangent dans un écran de validation |
+| 40–49 s | 1200–1470 | Point du jour (`Brief.tsx`)     | sombre | Le panneau de validation « devient la nuit » ; carte du matin préparée par la secrétaire, trois décisions en attente, note de l’aide comptable en second plan |
 | 49–56 s | 1470–1680 | Vous décidez (`Decide.tsx`)     | clair  | La ligne « devis » s'ouvre en gros plan ; Modifier · Valider · Plus tard ; une validation explicite change son état ; les autres restent « En attente » ; l'interface se réduit à un point bleu |
 | 56–60 s | 1680–1800 | Signature (`End.tsx`)           | clair  | Le point bleu se divise en six points (six assistants) ; signature et mention « Concept d'application — démonstration illustrative » |
 
@@ -43,6 +43,10 @@ Continuité des objets entre les plans : demande → carte d'assistant ; carte S
 téléphone ; mini-fiche du chat → grande fiche → brouillon (le t-shirt glisse de la vignette
 à la miniature) ; statut du brouillon → cercle de la scène suivante ; panneau de validation →
 fond de nuit ; ligne « devis » → gros plan ; bouton validé → point bleu → six points.
+
+Les six assistants suivent le dossier projet (septembre 2026) : secrétaire, commercial,
+stock et achats, webmaster, communication, **aide comptable**. Leurs libellés, couleurs et
+pictogrammes sont définis dans `src/theme.ts` (`ROLES`).
 
 ## Organisation
 

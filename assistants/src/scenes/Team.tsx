@@ -25,7 +25,7 @@ const SLOTS: Record<RoleId, {x: number; y: number; side: -1 | 1}> = {
 	stock: {x: 480, y: 792, side: -1},
 	web: {x: 1440, y: 432, side: 1},
 	com: {x: 1516, y: 612, side: 1},
-	pilotage: {x: 1440, y: 792, side: 1},
+	compta: {x: 1440, y: 792, side: 1},
 };
 
 const TASKS: Record<RoleId, string> = {
@@ -34,7 +34,7 @@ const TASKS: Record<RoleId, string> = {
 	stock: 'Surveille les t-shirts bleus',
 	web: 'Met à jour les horaires',
 	com: 'Prépare une publication',
-	pilotage: 'Prépare le point du jour',
+	compta: 'Prépare la facture de solde',
 };
 
 // ————————————————————————————————————————————— Overload items
@@ -234,19 +234,19 @@ const ITEMS: Item[] = [
 	},
 	{
 		id: 'prio',
-		role: 'pilotage',
+		role: 'compta',
 		primary: true,
 		x: 1262,
 		y: 968,
-		w: 300,
+		w: 356,
 		h: 118,
 		rot: -3.2,
 		at: 131,
 		from: [30, 70],
 		body: (
 			<>
-				<Line icon="compass" color={ROLES.pilotage.color} kicker="Aujourd’hui" />
-				<T weight={600}>Par quoi commencer ?</T>
+				<Line icon="receipt" color={ROLES.compta.color} kicker="Paiement en retard" />
+				<T weight={600}>Facture de M. Leroy à relancer</T>
 			</>
 		),
 	},
@@ -286,8 +286,8 @@ const ITEMS: Item[] = [
 	},
 ];
 
-// Pilotage has no overload card of its own among the first ones; the
-// "Par quoi commencer ?" note becomes it. Every role has exactly one primary.
+// Every role has exactly one primary card; the unpaid-invoice note becomes
+// the accounting assistant.
 
 // ————————————————————————————————————————————— Timing
 
@@ -441,9 +441,9 @@ const link = (role: RoleId, k = 0): [[number, number], [number, number], [number
 const PACKETS: {from: RoleId; to: RoleId; label: string; icon: IconName; at: number}[] = [
 	{from: 'secretaire', to: 'com', label: 'Photos du chantier', icon: 'image', at: 282},
 	{from: 'stock', to: 'commercial', label: 'Disponibilités', icon: 'box', at: 300},
-	{from: 'commercial', to: 'pilotage', label: 'Devis terrasse', icon: 'doc', at: 318},
+	{from: 'commercial', to: 'compta', label: 'Devis accepté', icon: 'doc', at: 318},
 	{from: 'com', to: 'web', label: 'Visuel prêt', icon: 'image', at: 338},
-	{from: 'pilotage', to: 'secretaire', label: 'Rappel 14 h 30', icon: 'calendar', at: 354},
+	{from: 'secretaire', to: 'compta', label: 'Facture reçue', icon: 'receipt', at: 354},
 ];
 
 const Packet: React.FC<{f: number; p: (typeof PACKETS)[number]}> = ({f, p}) => {

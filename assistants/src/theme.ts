@@ -30,7 +30,7 @@ export const C = {
 export const FONT_DISPLAY = '"Inter Tight", "Inter", system-ui, sans-serif';
 export const FONT_UI = '"Inter", system-ui, sans-serif';
 
-export type RoleId = 'secretaire' | 'commercial' | 'stock' | 'web' | 'com' | 'pilotage';
+export type RoleId = 'secretaire' | 'commercial' | 'stock' | 'web' | 'com' | 'compta';
 
 export type Role = {
 	id: RoleId;
@@ -46,6 +46,7 @@ export type IconName =
 	| 'browser'
 	| 'megaphone'
 	| 'compass'
+	| 'receipt'
 	| 'folder'
 	| 'mic'
 	| 'camera'
@@ -74,10 +75,10 @@ export const ROLES: Record<RoleId, Role> = {
 	stock: {id: 'stock', label: 'Stock et achats', color: '#4F9A3E', icon: 'box'},
 	web: {id: 'web', label: 'Webmaster', color: '#6F63E6', icon: 'browser'},
 	com: {id: 'com', label: 'Communication', color: '#D9486F', icon: 'megaphone'},
-	pilotage: {id: 'pilotage', label: 'Pilotage', color: '#C7951A', icon: 'compass'},
+	compta: {id: 'compta', label: 'Aide comptable', color: '#C7951A', icon: 'receipt'},
 };
 
-export const ROLE_ORDER: RoleId[] = ['secretaire', 'commercial', 'stock', 'web', 'com', 'pilotage'];
+export const ROLE_ORDER: RoleId[] = ['secretaire', 'commercial', 'stock', 'web', 'com', 'compta'];
 
 export const SHADOW = {
 	card: '0 1px 1px rgba(21,23,28,0.04), 0 6px 16px -6px rgba(21,23,28,0.10), 0 22px 48px -22px rgba(21,23,28,0.22)',
