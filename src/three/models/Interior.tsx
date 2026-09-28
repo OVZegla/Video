@@ -304,3 +304,156 @@ export const RedAcrylicPlate: React.FC<{rotY: number}> = ({rotY}) => {
 		</group>
 	);
 };
+
+/* ------------------------------------------------ palm-leaf claustra (laser-cut room divider) */
+
+/**
+ * Cut pattern: sweeping palm leaves, each a curved midrib with tapered slots
+ * on both sides (the slots are the holes), overlapping like the client's
+ * divider. White = material, black = cut.
+ */
+const usePalmCut = () =>
+	useMemo(() => {
+		const W = 600;
+		const H = 1400;
+		const {c, ctx} = makeCanvas(W, H);
+		ctx.fillStyle = '#ffffff';
+		ctx.fillRect(0, 0, W, H);
+		ctx.fillStyle = '#000000';
+		ctx.strokeStyle = '#000000';
+		ctx.lineCap = 'round';
+		const r = rng(19);
+		/**
+		 * One palm frond: slots are filled crescents between neighbouring ribs,
+		 * wide and sweeping, so the remaining material reads as bold leaf ribs.
+		 */
+		const leaf = (x0: number, y0: number, ang: number, len: number, bend: number) => {
+			const x2 = x0 + Math.cos(ang) * len;
+			const y2 = y0 + Math.sin(ang) * len;
+			const mx = (x0 + x2) / 2 + Math.cos(ang + Math.PI / 2) * bend;
+			const my = (y0 + y2) / 2 + Math.sin(ang + Math.PI / 2) * bend;
+			const P = (t: number) => ({
+				x: (1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * mx + t * t * x2,
+				y: (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * my + t * t * y2,
+			});
+			const ribs = 8;
+			const rib = 12; // material left between slots (px)
+			const stem = 10; // half-width of the solid midrib
+			for (const side of [-1, 1]) {
+				for (let k = 0; k < ribs; k++) {
+					const t0 = 0.08 + (k / ribs) * 0.86;
+					const t1 = 0.08 + ((k + 1) / ribs) * 0.86;
+					const tm = (t0 + t1) / 2;
+					const reach = len * 0.5 * Math.sin(Math.PI * Math.min(0.98, tm * 1.05)) + 30;
+					// slot outline: from the midrib, sweep out and back towards the tip
+					const pa = P(t0);
+					const pb = P(t1);
+					const dirA = Math.atan2(P(t0 + 0.01).y - pa.y, P(t0 + 0.01).x - pa.x);
+					const dirB = Math.atan2(P(t1 + 0.01).y - pb.y, P(t1 + 0.01).x - pb.x);
+					const nA = dirA + side * Math.PI / 2;
+					const nB = dirB + side * Math.PI / 2;
+					const sweep = side * -0.75; // ribs lean towards the tip
+					const a0x = pa.x + Math.cos(nA) * stem + Math.cos(dirA) * rib * 0.5;
+					const a0y = pa.y + Math.sin(nA) * stem + Math.sin(dirA) * rib * 0.5;
+					const b0x = pb.x + Math.cos(nB) * stem - Math.cos(dirB) * rib * 0.5;
+					const b0y = pb.y + Math.sin(nB) * stem - Math.sin(dirB) * rib * 0.5;
+					const outA = nA - sweep * 0.9;
+					const outB = nB - sweep * 0.9;
+					const a1x = a0x + Math.cos(outA) * reach;
+					const a1y = a0y + Math.sin(outA) * reach;
+					const b1x = b0x + Math.cos(outB) * reach * 1.02;
+					const b1y = b0y + Math.sin(outB) * reach * 1.02;
+					const bow = reach * 0.22;
+					ctx.beginPath();
+					ctx.moveTo(a0x, a0y);
+					ctx.quadraticCurveTo(
+						(a0x + a1x) / 2 + Math.cos(outA + side * Math.PI / 2) * bow,
+						(a0y + a1y) / 2 + Math.sin(outA + side * Math.PI / 2) * bow,
+						a1x,
+						a1y,
+					);
+					ctx.quadraticCurveTo((a1x + b1x) / 2, (a1y + b1y) / 2, b1x, b1y);
+					ctx.quadraticCurveTo(
+						(b0x + b1x) / 2 + Math.cos(outB + side * Math.PI / 2) * bow,
+						(b0y + b1y) / 2 + Math.sin(outB + side * Math.PI / 2) * bow,
+						b0x,
+						b0y,
+					);
+					ctx.closePath();
+					ctx.fill();
+				}
+			}
+		};
+		const leaves = [
+			[60, 120, 0.35, 520, 70],
+			[560, 420, 3.5, 520, -80],
+			[40, 640, 0.1, 520, -70],
+			[560, 900, 3.3, 500, 70],
+			[60, 1180, -0.2, 520, 60],
+			[420, 1380, -2.2, 360, -50],
+			[500, 40, 2.6, 330, 40],
+		];
+		for (const [x, y, a, l, b] of leaves) leaf(x, y, a + (r() - 0.5) * 0.08, l, b);
+		// re-draw the frond midribs as solid material so fronds stay connected
+		ctx.strokeStyle = '#ffffff';
+		ctx.lineWidth = 16;
+		ctx.lineCap = 'round';
+		for (const [x0, y0, a, l, b] of leaves) {
+			const x2 = x0 + Math.cos(a) * l;
+			const y2 = y0 + Math.sin(a) * l;
+			const mx = (x0 + x2) / 2 + Math.cos(a + Math.PI / 2) * b;
+			const my = (y0 + y2) / 2 + Math.sin(a + Math.PI / 2) * b;
+			ctx.beginPath();
+			ctx.moveTo(x0, y0);
+			ctx.quadraticCurveTo(mx, my, x2, y2);
+			ctx.stroke();
+		}
+		// solid border for the frame rebate
+		ctx.fillStyle = '#ffffff';
+		ctx.fillRect(0, 0, W, 18);
+		ctx.fillRect(0, H - 18, W, 18);
+		ctx.fillRect(0, 0, 18, H);
+		ctx.fillRect(W - 18, 0, 18, H);
+		return toTexture(c, false);
+	}, []);
+
+export const PalmClaustra: React.FC<{rotY: number; glow: number}> = ({rotY, glow}) => {
+	const cut = usePalmCut();
+	const mdf = useMemo(() => toTexture(paintWood(300, 700, 23, 'oak')), []);
+	const oak = useMemo(() => toTexture(paintWood(128, 1024, 29, 'oak')), []);
+	const warm = useWarmGlow();
+	const w = 1.1;
+	const h = 2.4;
+	// stacked cut planes give the panel real thickness and visible kerf walls
+	const layers = 7;
+	return (
+		<group rotation={[0, rotY, 0]}>
+			<mesh position={[0, 0, -0.35]}>
+				<planeGeometry args={[1.8, 3]} />
+				<meshBasicMaterial map={warm} transparent blending={AdditiveBlending} depthWrite={false} opacity={glow} toneMapped={false} />
+			</mesh>
+			{Array.from({length: layers}, (_, k) => {
+				const z = -0.03 + (k * 0.06) / (layers - 1);
+				const face = k === layers - 1;
+				return (
+					<mesh key={k} position={[0, 0, z]}>
+						<planeGeometry args={[w, h]} />
+						<meshStandardMaterial map={mdf} alphaMap={cut} alphaTest={0.5} color={face ? '#ffffff' : '#9c7550'} roughness={0.8} side={2} />
+					</mesh>
+				);
+			})}
+			{/* oak frame */}
+			{[
+				[0, h / 2 + 0.04, w + 0.16, 0.08],
+				[0, -h / 2 - 0.04, w + 0.16, 0.08],
+				[-w / 2 - 0.04, 0, 0.08, h + 0.16],
+				[w / 2 + 0.04, 0, 0.08, h + 0.16],
+			].map(([x, y, fw, fh], k) => (
+				<mesh key={k} position={[x, y, 0]}>
+					<boxGeometry args={[fw, fh, 0.12]} />
+					<meshStandardMaterial map={oak} roughness={0.55} />
+				</mesh>
+			))}
+		</group>
+	);
+};

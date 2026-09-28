@@ -3,6 +3,7 @@ import {ExtrudeGeometry, LatheGeometry, Shape, Vector2} from 'three';
 import {makeCanvas, paintBrushed, paintWood, rng, toTexture, useImage} from '../textures';
 import {brand, drawEye, drawLogo, drawLogoMono} from '../paint';
 import {C, FONT} from '../../theme';
+import {resample} from '../geom';
 import {DISPLAY} from '../../fonts';
 
 /* ------------------------------------------------ insulated bottle, laser-engraved */
@@ -19,23 +20,6 @@ const bottleProfile = () =>
 		[0.24, 0.94],
 		[0.24, 1.0],
 	].map(([x, y]) => new Vector2(x, y));
-
-/**
- * LatheGeometry spreads v evenly per profile point, not per length: resample the
- * profile uniformly by arc length so a texture keeps its proportions.
- */
-const resample = (pts: Vector2[], n: number) => {
-	const seg = pts.slice(1).map((p, k) => p.distanceTo(pts[k]));
-	const total = seg.reduce((a, b) => a + b, 0);
-	const out: Vector2[] = [];
-	for (let i = 0; i < n; i++) {
-		let d = (i / (n - 1)) * total;
-		let k = 0;
-		while (k < seg.length - 1 && d > seg[k]) d -= seg[k++];
-		out.push(pts[k].clone().lerp(pts[k + 1], Math.min(1, d / seg[k])));
-	}
-	return out;
-};
 
 /** Powder-coated blue with the engraving exposing the steel underneath. */
 const useBottleSkin = (name: string) => {

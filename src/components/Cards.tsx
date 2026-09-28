@@ -29,7 +29,8 @@ export const HeroCard: React.FC<{
 	maxSize?: number;
 	accentLine?: number; // index of a line drawn in the accent colour
 	measure?: string; // size as if the longest line were this (to match neighbours)
-}> = ({lf, lines, ink, sub, maxSize = 96, accentLine, measure}) => {
+	kicker?: string; // small label above the rule, e.g. a category number
+}> = ({lf, lines, ink, sub, maxSize = 96, accentLine, measure, kicker}) => {
 	const longest = measure ?? lines.reduce((a, b) => (b.length > a.length ? b : a));
 	const size = useFitSize(longest, HERO_FONT, WIN_W - 14, maxSize, 0.01);
 	if (!size) return null;
@@ -51,6 +52,9 @@ export const HeroCard: React.FC<{
 					gap: 11,
 				}}
 			>
+				{kicker ? (
+					<div style={{fontFamily: FONT, fontWeight: 600, fontSize: 13, letterSpacing: '0.3em', paddingLeft: '0.3em', color: ink.sub, opacity: rule}}>{kicker}</div>
+				) : null}
 				<Tricolour p={rule} mid={ink.plate === C.white ? C.sky : C.white} />
 				<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', transform: `scale(${breathe})`}}>
 					{lines.map((line, k) => (

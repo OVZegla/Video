@@ -11,7 +11,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-FRAMES=1560
+FRAMES=2490
 CHUNK=150
 SEQ=${FRAMES_DIR:-${TMPDIR:-/tmp}/vu_frames} # no dot in the name: Remotion rejects it
 mkdir -p "$SEQ"
