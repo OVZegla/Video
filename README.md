@@ -41,3 +41,35 @@ scenes. Bauhaus rails and scene lines cross the windows continuously; text and p
 - `src/three/`: 3D product stage (studio lighting, mirror floor, orbiting camera), models (`models/*`), procedural textures
 - `public/brand/`: official logo (original + white LED versions), plus "Vision" / "Urbaine" crops for the stacked lockup
 - `public/fonts/`: Jost and Archivo (SIL OFL), bundled so renders work offline
+
+---
+
+# Vision Urbaine — franchise presentation film
+
+A second composition, **`Franchise`**: a 1920 × 1080, 30 fps, ~2 min 21 s motion design
+presenting the store concept to future franchisees (no audio — add a music bed in editing).
+
+```bash
+npm run studio                # pick "Franchise"
+scripts/render-franchise.sh   # → out/vision-urbaine-franchise.mp4
+```
+
+**All on-screen text lives in `src/franchise/copy.ts`**; change the wording there.
+
+| # | Scene | What it shows |
+|---|-------|---------------|
+| — | Intro | Bauhaus shapes gather into the logo's eye, then the logo and "Le temple de la personnalisation" |
+| 01 | Le concept | The mall walk-through video in an arched window; the five verbs |
+| 01 | Trois espaces | Boutique · Atelier · Sur-mesure |
+| 02 | Tout personnaliser | 14 objects on a growing track, from a phone case to a whole interior, each personalised by a laser sweep |
+| 03 | Attirer | The façade with a live LED window drawing passers-by in, then the façade render |
+| 04 | Le magasin | The 3D concept view, then the plan drawn zone by zone |
+| 05 | Le parcours client | Five steps walked on the plan |
+| 06 | L'atelier | A laser engraving then cutting a wooden disc; techniques and materials |
+| 07 | Sur mesure | The showroom wall with material callouts; client types |
+| 08 | La franchise | What a franchisee receives |
+| — | Fin | "Créer aujourd'hui un demain plus beau", logo, "Devenez franchisé" |
+
+Files: `src/franchise/Franchise.tsx` (timeline, wipes, chrome), `scenes/*`, `ui.tsx`
+(shared pieces), `icons.tsx` (product illustrations), `theme.ts`. Photos and the
+walk-through video are in `public/franchise/`.
