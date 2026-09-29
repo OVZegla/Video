@@ -1,6 +1,6 @@
 import React from 'react';
-import {useCurrentFrame} from 'remotion';
-import {DURATION, HEIGHT, WIDTH, WIN_W} from '../theme';
+import {useCurrentFrame, useVideoConfig} from 'remotion';
+import {HEIGHT, WIDTH, WIN_W} from '../theme';
 
 /**
  * Bauhaus pattern vocabulary (after the brand's graphic motif): flowing bundles
@@ -151,9 +151,9 @@ export const MotifShape: React.FC<{m: Motif; color: string; p: number}> = ({m, c
  */
 export type Ribbon = {y0: number; amp: number; waves: number; n: number; gap: number; width: number; tilt?: number};
 
-const ribbonPaths = (rb: Ribbon, frame: number, x0: number) => {
-	// phase: 2 full cycles per loop → seamless at frame 900
-	const phase = (frame / DURATION) * Math.PI * 2 * 2;
+const ribbonPaths = (rb: Ribbon, frame: number, x0: number, duration: number) => {
+	// phase: 2 full cycles per loop → seamless whatever the composition length
+	const phase = (frame / duration) * Math.PI * 2 * 2;
 	const paths: string[] = [];
 	for (let k = 0; k < rb.n; k++) {
 		const off = (k - (rb.n - 1) / 2) * rb.gap;
@@ -181,6 +181,7 @@ export type WindowStyle = {
 /** A window's coloured ground with its Bauhaus motifs and its slice of the ribbon. */
 export const WindowBg: React.FC<{i: number; style: WindowStyle; lf: number}> = ({i, style, lf}) => {
 	const frame = useCurrentFrame();
+	const {durationInFrames} = useVideoConfig();
 	const p = (k: number) => clamp((lf - 4 - k * 8) / 40);
 	const rp = clamp((lf - 10) / 40);
 	return (
@@ -190,7 +191,7 @@ export const WindowBg: React.FC<{i: number; style: WindowStyle; lf: number}> = (
 				<MotifShape key={k} m={m} color={style.fg} p={p(k)} />
 			))}
 			{style.ribbon
-				? ribbonPaths(style.ribbon, frame, i * WIN_W).map((d, k) => (
+				? ribbonPaths(style.ribbon, frame, i * WIN_W, durationInFrames).map((d, k) => (
 						<path
 							key={k}
 							d={d}

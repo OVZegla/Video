@@ -13,7 +13,7 @@ const SCALE = (WIN_W - 8) / URBAINE.w; // "Urbaine" fills the window; "Vision" s
 const RIBBON_LOGO: Ribbon = {y0: 170, amp: 80, waves: 1.1, n: 7, gap: 9, width: 4.5, tilt: -30};
 
 /** The logo stacked to fit one window, tagline beneath (all white), on a plate. */
-const Lockup: React.FC<{lf: number}> = ({lf}) => {
+export const Lockup: React.FC<{lf: number}> = ({lf}) => {
 	const plate = prog(lf, 0, 26, ease.out);
 	const v = prog(lf, 4, 32, ease.out);
 	const u = prog(lf, 10, 38, ease.out);

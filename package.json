@@ -6,16 +6,19 @@
   "scripts": {
     "studio": "remotion studio",
     "typecheck": "tsc --noEmit",
-    "render": "scripts/render.sh"
+    "render": "scripts/render.sh",
+    "render:pub": "COMP=VisionUrbainePub scripts/render.sh"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",
     "@fontsource/jost": "^5.3.0",
     "@react-three/fiber": "^8.17.10",
+    "@react-three/postprocessing": "^2.19.1",
     "@remotion/cli": "4.0.290",
     "@remotion/fonts": "^4.0.290",
     "@remotion/three": "^4.0.290",
     "@types/three": "^0.170.0",
+    "postprocessing": "^6.36.7",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "remotion": "4.0.290",
