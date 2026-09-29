@@ -40,9 +40,26 @@ flowing stripe ribbon cross the windows, while text and products stay inside one
 | 2190–2390 | CRÉER · AUJOURD'HUI · UN DEMAIN · PLUS · BEAU |
 | 2390–2490 | band brings the logo back; frame 2490 ≡ frame 0 |
 
+## The ad — `VisionUrbainePub` (50 s, `npm run render:pub`)
+
+A show staged across the five windows, on one panoramic 3D world seen through all of them:
+
+| Frames    | Sequence |
+|-----------|----------|
+| 0–150     | Blackout; a laser burns a line across the storefront → GRAVER · DÉCOUPER · PERSONNALISER |
+| 150–420   | TOUTES · LES · MATIÈRES → oak, black anodised alu, acrylic, slate, leather engraved live |
+| 420–720   | DU PETIT · OBJET · AU · GRAND · FORMAT → a storefront-wide panel laser-cut, backlight on |
+| 720–1020  | VOTRE · NOM · PARTOUT → one name engraved / UV-printed on five objects |
+| 1020–1260 | Flip cards: our trades, then who we work for |
+| 1260–1500 | ENTREZ → / ← C'EST ICI (the door is between windows 1 and 2) · logo · UN PROJET ? PARLONS-EN ! · fade to black |
+
+Realism: laser-engraving and laser-cut shaders injected into three's PBR materials,
+height-map → normal-map generation for each material, GPU spark particles, bloom.
+
 ## Files
 
 - `src/VisionUrbaine.tsx`: main composition and timeline
+- `src/pub/`: the ad (panoramic stage, materials & shaders, engraved objects, segments)
 - `src/scenes/`: `LogoRest` (loop anchor), `Categories` (intro + the five categories), `Scenes` (verbs, CRÉEZ, closing line)
 - `src/components/Sweep.tsx`: tricolour band and Bauhaus rails/lines
 - `src/components/Card.tsx`: per-window content revealed and removed by the band
