@@ -29,13 +29,14 @@ VisionUrbainePub)
 	NAMES=(pub-01-allumage pub-02-matieres pub-03-grand-format pub-04-votre-nom pub-05-metiers pub-06-entrez)
 	DEFAULT_VERSION=v1
 	CONCURRENCY=1 # heavy panoramic 3D + bloom: one tab at a time stays stable
+	CHUNK=50      # and a fresh browser every 50 frames (long sessions degrade)
 	;;
 *)
 	echo "unknown COMP $COMP" >&2
 	exit 1
 	;;
 esac
-CHUNK=150
+CHUNK=${CHUNK:-150}
 CONCURRENCY=${CONCURRENCY:-2}
 # LED players cache files by name: bump VERSION for every new delivery so the
 # screen picks up the new clips instead of replaying the old ones.
