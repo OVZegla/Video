@@ -51,7 +51,7 @@ presenting the store concept to future franchisees (no audio — add a music bed
 
 ```bash
 npm run studio                # pick "Franchise"
-scripts/render-franchise.sh   # → out/vision-urbaine-franchise.mp4
+scripts/render-franchise.sh   # → out/vision-urbaine-franchise.mp4 (via scripts/render-film.sh)
 ```
 
 **All on-screen text lives in `src/franchise/copy.ts`**; change the wording there.
@@ -73,3 +73,30 @@ scripts/render-franchise.sh   # → out/vision-urbaine-franchise.mp4
 Files: `src/franchise/Franchise.tsx` (timeline, wipes, chrome), `scenes/*`, `ui.tsx`
 (shared pieces), `icons.tsx` (product illustrations), `theme.ts`. Photos and the
 walk-through video are in `public/franchise/`.
+
+---
+
+# Vision Urbaine — training & support film
+
+A third composition, **`Formation`**: 1920 × 1080, 30 fps, ~5 min 13 s, no audio. It
+presents the franchisee training and support path: an intro ("Votre atelier prend
+forme"), the 13 modules, then the closing lines and logo.
+
+```bash
+npm run studio                # pick "Formation"
+scripts/render-formation.sh   # → out/vision-urbaine-formation.mp4
+```
+
+**All on-screen text is in `src/formation/copy.ts`**, as supplied: each module is a
+title and paragraphs ("beats"), each paragraph a list of lines. Beat timing is
+derived from word count (`beatLen` in `scenes.tsx`), so text can change freely and
+the film re-times itself.
+
+Each module shows an illustration panel on the left that changes with every
+paragraph, and the text on the right, where the current paragraph is highlighted
+and the previous ones stay dimmed. A 13-step track at the bottom shows progress.
+
+Files: `src/formation/Formation.tsx` (timeline, chrome), `scenes.tsx` (module
+layout, intro, outro), `modules.tsx` (which illustration goes with which
+paragraph), `stages.tsx` (the animated illustrations), `glyphs.tsx` (pictograms).
+It reuses the franchise film's theme, shapes and tricolour wipe.

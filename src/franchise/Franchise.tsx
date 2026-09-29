@@ -30,7 +30,7 @@ export const FRANCHISE_DURATION = STARTS[STARTS.length - 1] + SCENES[SCENES.leng
 const WIPE = 30; // frames; the navy panel fully covers the frame at its midpoint
 
 /** Tricolour-edged navy panel sweeping across; scenes swap underneath it. */
-const Wipe: React.FC<{at: number}> = ({at}) => {
+export const Wipe: React.FC<{at: number}> = ({at}) => {
 	const f = useCurrentFrame();
 	const t = p(f, at - WIPE / 2, at + WIPE / 2, ease.inOut);
 	if (t <= 0 || t >= 1) return null;

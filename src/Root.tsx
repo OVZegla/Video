@@ -4,6 +4,7 @@ import {VisionUrbaine} from './VisionUrbaine';
 import {DURATION, FPS, HEIGHT, WIDTH} from './theme';
 import {Franchise, FRANCHISE_DURATION} from './franchise/Franchise';
 import {FFPS, FH, FW} from './franchise/theme';
+import {Formation, FORMATION_DURATION} from './formation/Formation';
 
 export const RemotionRoot: React.FC = () => {
 	return (
@@ -20,6 +21,14 @@ export const RemotionRoot: React.FC = () => {
 				id="Franchise"
 				component={Franchise}
 				durationInFrames={FRANCHISE_DURATION}
+				fps={FFPS}
+				width={FW}
+				height={FH}
+			/>
+			<Composition
+				id="Formation"
+				component={Formation}
+				durationInFrames={FORMATION_DURATION}
 				fps={FFPS}
 				width={FW}
 				height={FH}
