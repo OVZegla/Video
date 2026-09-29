@@ -76,9 +76,9 @@ export const PanoStage: React.FC<{
 		<ThreeCanvas
 			width={WIDTH}
 			height={HEIGHT}
-			dpr={2}
+			dpr={1.5}
 			frameloop="demand"
-			gl={{antialias: true, preserveDrawingBuffer: true}}
+			gl={{antialias: false, preserveDrawingBuffer: true}}
 			camera={{fov: FOV, position: [0, 0, CAM_Z], near: 0.1, far: 100}}
 			onCreated={({gl}) => {
 				gl.toneMapping = NeutralToneMapping;
@@ -91,7 +91,7 @@ export const PanoStage: React.FC<{
 			<directionalLight position={[4, 6, 8]} intensity={1.6} color="#fff1e0" />
 			<directionalLight position={[-6, 2, -4]} intensity={2.2} color="#8fc3ff" />
 			{children}
-			<EffectComposer multisampling={4}>
+			<EffectComposer multisampling={2}>
 				<Bloom intensity={bloom} luminanceThreshold={threshold} luminanceSmoothing={0.2} mipmapBlur />
 				<Vignette eskil={false} offset={0.25} darkness={0.55} />
 			</EffectComposer>

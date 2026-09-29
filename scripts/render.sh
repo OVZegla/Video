@@ -28,6 +28,7 @@ VisionUrbainePub)
 	CUTS=(0 150 420 720 1020 1260 1500)
 	NAMES=(pub-01-allumage pub-02-matieres pub-03-grand-format pub-04-votre-nom pub-05-metiers pub-06-entrez)
 	DEFAULT_VERSION=v1
+	CONCURRENCY=1 # heavy panoramic 3D + bloom: one tab at a time stays stable
 	;;
 *)
 	echo "unknown COMP $COMP" >&2
@@ -35,6 +36,7 @@ VisionUrbainePub)
 	;;
 esac
 CHUNK=150
+CONCURRENCY=${CONCURRENCY:-2}
 # LED players cache files by name: bump VERSION for every new delivery so the
 # screen picks up the new clips instead of replaying the old ones.
 VERSION=${VERSION:-$DEFAULT_VERSION}
@@ -53,7 +55,7 @@ for ((a = 0; a < FRAMES; a += CHUNK)); do
 	tmp="$SEQ/chunk_$a"
 	rm -rf "$tmp"
 	npx remotion render "$COMP" "$tmp" --sequence --image-format=png \
-		--frames="$a-$b" --concurrency=2 "$@"
+		--frames="$a-$b" --concurrency="$CONCURRENCY" "$@"
 	# Remotion's zero-padding depends on the chunk; rename to a fixed width.
 	for f in "$tmp"/element-*.png; do
 		n=${f##*/element-}
