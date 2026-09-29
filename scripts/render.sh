@@ -2,8 +2,8 @@
 # Robust render: frames are rendered in chunks (fresh browser each time, which
 # keeps the WebGL product stages stable on machines without a GPU), then encoded
 # once into two MP4s:
-#   out/vision-urbaine.mp4             H.264 High, CRF 16 (small, high quality)
-#   out/vision-urbaine-compatible.mp4  H.264 Constrained Baseline, CBR 3 Mb/s,
+#   out/vision-urbaine-complete-$VERSION.mp4    H.264 High, CRF 16 (small, high quality)
+#   out/vision-urbaine-compatible-$VERSION.mp4 H.264 Constrained Baseline, CBR 3 Mb/s,
 #                                      1 s GOP, no B-frames (for picky LED players)
 #   out/clips/VU-0x-*-$VERSION.mp4     the loop cut into ≤ 15 s clips at scene changes
 #
@@ -50,13 +50,13 @@ mkdir -p out
 npx remotion ffmpeg -y -loglevel error -framerate 30 -i "$SEQ/f-%05d.png" \
 	-c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p \
 	-colorspace bt709 -color_primaries bt709 -color_trc bt709 \
-	-movflags +faststart -an out/vision-urbaine.mp4
+	-movflags +faststart -an out/vision-urbaine-complete-$VERSION.mp4
 
 npx remotion ffmpeg -y -loglevel error -framerate 30 -i "$SEQ/f-%05d.png" \
 	-c:v libx264 -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 \
 	-g 30 -keyint_min 30 -sc_threshold 0 -bf 0 -refs 1 \
 	-b:v 3M -maxrate 3M -bufsize 6M -x264-params nal-hrd=cbr \
-	-movflags +faststart -an -map_metadata -1 out/vision-urbaine-compatible.mp4
+	-movflags +faststart -an -map_metadata -1 out/vision-urbaine-compatible-$VERSION.mp4
 
 # ≤ 15 s clips cut at scene boundaries, for players with duration/size limits
 mkdir -p out/clips
@@ -71,4 +71,4 @@ for ((k = 0; k < ${#NAMES[@]}; k++)); do
 done
 
 rm -rf "$SEQ"
-echo "✔ out/vision-urbaine.mp4 and out/vision-urbaine-compatible.mp4 ($FRAMES frames)"
+echo "✔ out/vision-urbaine-complete-$VERSION.mp4, out/vision-urbaine-compatible-$VERSION.mp4 and clips ($FRAMES frames)"

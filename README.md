@@ -11,7 +11,7 @@ inside a single window**, so no letter is ever cut by a gap.
 npm install
 npm run studio      # preview in Remotion Studio
 npm run typecheck
-npm run render      # → out/vision-urbaine.mp4 + out/vision-urbaine-compatible.mp4 (≈ 15–20 min without a GPU)
+npm run render      # → out/vision-urbaine-complete-vN.mp4 + compatible + clips (bump VERSION=vN for each delivery) (≈ 15–20 min without a GPU)
 ```
 
 `npm run render` runs `scripts/render.sh`: frames are rendered in chunks (stable WebGL on
