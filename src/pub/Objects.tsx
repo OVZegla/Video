@@ -190,9 +190,10 @@ const useBigPattern = () =>
 /**
  * Plywood panel the size of the storefront. The laser sweeps left → right;
  * cut holes open behind it (discard), their edges charred, the kerf front
- * glowing. A backlight wall behind shines through the holes.
+ * glowing. Nothing sits behind the panel: the holes show pure black, which on
+ * the transparent LED screens reads as clear glass.
  */
-export const CutPanel: React.FC<{progress: number; light: number}> = ({progress, light}) => {
+export const CutPanel: React.FC<{progress: number}> = ({progress}) => {
 	const mask = useBigPattern();
 	const wood = useMemo(() => toTexture(paintWood(1024, 420, 17, 'birch')), []);
 	const geom = useMemo(() => plateGeometry(roundRectShape(15.4, 6.3, 0.08), 0.1, 0.01), []);
@@ -226,22 +227,8 @@ export const CutPanel: React.FC<{progress: number; light: number}> = ({progress,
 	}, [mask, wood]);
 	uniforms.uProgress.value = progress;
 
-	const back = useMemo(() => {
-		const {c, ctx} = makeCanvas(512, 256);
-		const g = ctx.createRadialGradient(256, 128, 10, 256, 128, 300);
-		g.addColorStop(0, '#fff3dc');
-		g.addColorStop(0.45, '#ffd08a');
-		g.addColorStop(1, '#2451ff');
-		ctx.fillStyle = g;
-		ctx.fillRect(0, 0, 512, 256);
-		return toTexture(c);
-	}, []);
 	return (
 		<>
-			<mesh position={[0, 0, -0.9]}>
-				<planeGeometry args={[18, 8]} />
-				<meshBasicMaterial map={back} color={new Color(1.05 * light, 1.0 * light, 0.95 * light)} toneMapped={false} />
-			</mesh>
 			<mesh geometry={geom} material={material} />
 		</>
 	);

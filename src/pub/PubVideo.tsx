@@ -18,7 +18,7 @@ import {MatKind} from './materials';
  *
  *    0  blackout · a laser burns a line across all five windows → GRAVER · DÉCOUPER · PERSONNALISER
  *  150  band → TOUTES · LES · MATIÈRES          230 band → 5 materials engraved live (oak, alu, acrylic, slate, leather)
- *  420  band → DU PETIT · OBJET · AU · GRAND · FORMAT   500 band → a storefront-wide panel laser-cut, backlight on
+ *  420  band → DU PETIT · OBJET · AU · GRAND · FORMAT   500 band → a storefront-wide panel laser-cut, its holes open onto clear glass
  *  720  band → VOTRE · NOM · PARTOUT            800 band → the same name engraved/printed on five objects
  * 1020  band → cards flip: what we do, then who for
  * 1260  band → ENTREZ → · ← C'EST ICI · logo · UN PROJET ? · PARLONS-EN, fade to black → loop
@@ -220,14 +220,13 @@ const SegB: React.FC = () => (
 const SegCPano: React.FC<{lf: number}> = ({lf}) => {
 	const frame = useCurrentFrame();
 	const pr = prog(lf, 10, 150, ease.soft);
-	const light = prog(lf, 30, 170, ease.inOut);
 	const headX = -7.7 + pr * 15.4;
 	const dotY = Math.sin(frame * 1.7) * 2.9;
 	const cutting = pr > 0 && pr < 1;
 	const camZ = 10 - 0.5 * Math.sin(prog(lf, 0, 220) * Math.PI);
 	return (
 		<PanoStage bloom={0.75} camZ={camZ} env={0.45}>
-			<CutPanel progress={pr} light={light} />
+			<CutPanel progress={pr} />
 			{/* gantry rail */}
 			<mesh position={[0, 3.45, 0.7]}>
 				<boxGeometry args={[16.4, 0.12, 0.12]} />
