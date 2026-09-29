@@ -266,16 +266,35 @@ const useCapCrown = () => {
 			ctx.lineTo((k * W) / 6, H);
 			ctx.stroke();
 		}
-		// embroidered front (u = 0.25 faces +z on a three.js sphere)
-		const fx = W * 0.25;
-		drawEye(ctx, fx, H * 0.52, 58, {ring: '#ffffff', pupil: brand.blue, sector: brand.red});
-		drawLogo(ctx, logo, fx, H * 0.72, 250);
+		return toTexture(c);
+	}, [logo]);
+};
+
+/*
+ * Embroidery patch: a piece of sphere covering the crown's front, with its own
+ * UVs, so the design keeps its proportions instead of being stretched by the
+ * crown's wrap-around mapping. Arc size ≈ 1.1 rad × 0.72 · sin(1.05) wide by
+ * 0.66 rad × 0.72 tall → aspect ≈ 1.4, matched by the 700 × 500 canvas.
+ */
+const PATCH = {phi: 1.1, theta0: 0.72, theta: 0.66};
+
+const useCapPatch = () => {
+	const logo = useImage('brand/vision-urbaine-logo-white.png');
+	return useMemo(() => {
+		if (!logo) return null;
+		const W = 700;
+		const H = 500;
+		const {c, ctx} = makeCanvas(W, H);
+		ctx.clearRect(0, 0, W, H);
+		drawEye(ctx, W / 2, H * 0.36, 110, {ring: '#ffffff', pupil: brand.blue, sector: brand.red});
+		drawLogo(ctx, logo, W / 2, H * 0.72, 560);
 		return toTexture(c);
 	}, [logo]);
 };
 
 export const Cap: React.FC<{rotY: number}> = ({rotY}) => {
 	const crown = useCapCrown();
+	const patch = useCapPatch();
 	/**
 	 * Brim: a crescent whose inner edge follows the crown's front (ellipse
 	 * 0.72 × 0.78) and whose outer edge reaches forward (ellipse 0.72 × 1.28),
@@ -298,6 +317,12 @@ export const Cap: React.FC<{rotY: number}> = ({rotY}) => {
 				<mesh scale={[1, 0.95, 1.08]}>
 					<sphereGeometry args={[0.72, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
 					<meshPhysicalMaterial map={crown} roughness={0.9} sheen={1} sheenColor="#8aa0ff" sheenRoughness={0.7} side={2} />
+				</mesh>
+			) : null}
+			{patch ? (
+				<mesh scale={[1, 0.95, 1.08]}>
+					<sphereGeometry args={[0.725, 48, 24, Math.PI / 2 - PATCH.phi / 2, PATCH.phi, PATCH.theta0, PATCH.theta]} />
+					<meshStandardMaterial map={patch} transparent alphaTest={0.1} roughness={0.7} />
 				</mesh>
 			) : null}
 			{/* top button */}
