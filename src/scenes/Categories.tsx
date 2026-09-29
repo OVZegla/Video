@@ -139,7 +139,7 @@ export const SceneSmall: React.FC<SceneProps> = (p) => (
 				kind: 'item',
 				ground: 'white',
 				motifs: [{kind: 'tri', x: 16, y: 16, cell: 32, cols: 3, rows: 1}],
-				a: {title: 'CASQUETTES', camZ: 6.2, camY: 1.4, floorY: -0.95, model: (lf) => <Cap rotY={-0.45 + 0.35 * Math.sin(lf / 45)} />},
+				a: {title: 'CASQUETTES', camZ: 6.2, camY: 1.4, floorY: -0.95, model: (lf) => <Cap rotY={-0.3 + 0.22 * Math.sin(lf / 45)} />},
 				b: {title: 'GOURDES', camZ: 7.2, floorY: -1.12, model: (lf) => <Bottle rotY={spinIn(lf, -0.1, 0.35, 50)} name="Hugo" />},
 			},
 			{

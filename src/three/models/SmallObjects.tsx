@@ -112,13 +112,14 @@ const useShirtPrint = (color: string, ink: string, line1: string, line2: string)
 		}
 		ctx.fillStyle = ink;
 		ctx.textAlign = 'center';
-		ctx.font = `800 extra-condensed 118px ${DISPLAY}`;
+		// kept well inside the chest (the body spans roughly 0.2–0.8 of the texture width)
+		ctx.font = `800 extra-condensed 80px ${DISPLAY}`;
 		ctx.fillText(line1, W / 2, W * 0.46);
-		ctx.font = `600 64px ${FONT}`;
-		ctx.fillText(line2, W / 2, W * 0.55);
+		ctx.font = `600 44px ${FONT}`;
+		ctx.fillText(line2, W / 2, W * 0.52);
 		ctx.fillStyle = C.brandRed;
-		ctx.fillRect(W / 2 - 90, W * 0.585, 180, 10);
-		if (ink === '#ffffff') drawLogo(ctx, logo, W / 2, W * 0.64, 320);
+		ctx.fillRect(W / 2 - 60, W * 0.545, 120, 7);
+		if (ink === '#ffffff') drawLogo(ctx, logo, W / 2, W * 0.585, 220);
 		return toTexture(c);
 	}, [logo, color, ink, line1, line2]);
 };
@@ -275,14 +276,19 @@ const useCapCrown = () => {
 
 export const Cap: React.FC<{rotY: number}> = ({rotY}) => {
 	const crown = useCapCrown();
+	/**
+	 * Brim: a crescent whose inner edge follows the crown's front (ellipse
+	 * 0.72 × 0.78) and whose outer edge reaches forward (ellipse 0.72 × 1.28),
+	 * tapering to nothing at the sides, with a slight lateral curve.
+	 */
 	const visor = useMemo(() => {
 		const s = new Shape();
-		s.absarc(0, 0, 0.95, Math.PI * 0.08, Math.PI * 0.92, false);
-		s.absarc(0, 0, 0.62, Math.PI * 0.92, Math.PI * 0.08, true);
-		const g = new ExtrudeGeometry(s, {depth: 0.03, bevelEnabled: true, bevelThickness: 0.015, bevelSize: 0.015, bevelSegments: 3, curveSegments: 40});
-		// curve the brim downward at its sides
+		s.moveTo(0.72, 0);
+		s.absellipse(0, 0, 0.72, 0.78, 0, Math.PI, false, 0);
+		s.absellipse(0, 0, 0.72, 1.28, Math.PI, 0, true, 0);
+		const g = new ExtrudeGeometry(s, {depth: 0.025, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.012, bevelSegments: 3, curveSegments: 48});
 		const pos = g.attributes.position;
-		for (let i = 0; i < pos.count; i++) pos.setZ(i, pos.getZ(i) - 0.25 * Math.pow(pos.getX(i), 2));
+		for (let i = 0; i < pos.count; i++) pos.setZ(i, pos.getZ(i) + 0.1 * Math.pow(pos.getX(i), 2));
 		g.computeVertexNormals();
 		return g;
 	}, []);
@@ -300,7 +306,7 @@ export const Cap: React.FC<{rotY: number}> = ({rotY}) => {
 				<meshStandardMaterial color="#0f1f6e" roughness={0.8} />
 			</mesh>
 			{/* visor */}
-			<mesh geometry={visor} rotation={[Math.PI / 2 - 0.1, 0, 0]} position={[0, 0.03, 0.1]}>
+			<mesh geometry={visor} rotation={[Math.PI / 2 - 0.08, 0, 0]} position={[0, 0.02, 0]}>
 				<meshStandardMaterial color="#0f1f6e" roughness={0.85} />
 			</mesh>
 		</group>

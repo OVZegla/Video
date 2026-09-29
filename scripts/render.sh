@@ -5,6 +5,7 @@
 #   out/vision-urbaine.mp4             H.264 High, CRF 16 (small, high quality)
 #   out/vision-urbaine-compatible.mp4  H.264 Constrained Baseline, CBR 3 Mb/s,
 #                                      1 s GOP, no B-frames (for picky LED players)
+#   out/clips/VU-0x-*.mp4              the loop cut into ≤ 15 s clips at scene changes
 #
 # Usage: scripts/render.sh [--browser-executable=/path/to/chrome]
 # An interrupted render resumes: finished chunks are kept in FRAMES_DIR.
@@ -53,6 +54,18 @@ npx remotion ffmpeg -y -loglevel error -framerate 30 -i "$SEQ/f-%05d.png" \
 	-g 30 -keyint_min 30 -sc_threshold 0 -bf 0 -refs 1 \
 	-b:v 3M -maxrate 3M -bufsize 6M -x264-params nal-hrd=cbr \
 	-movflags +faststart -an -map_metadata -1 out/vision-urbaine-compatible.mp4
+
+# ≤ 15 s clips cut at scene boundaries, for players with duration/size limits
+mkdir -p out/clips
+CUTS=(0 300 600 900 1200 1500 1770 2190 2490)
+NAMES=(01-logo-intro 02-petits-objets 03-signaletique 04-deco-interieure 05-mariages-evenements 06-plexi-lumineux 07-creez-sans-limites 08-creer-aujourdhui)
+for ((k = 0; k < ${#NAMES[@]}; k++)); do
+	a=${CUTS[$k]}
+	n=$((CUTS[k + 1] - a))
+	npx remotion ffmpeg -y -loglevel error -framerate 30 -start_number "$a" -i "$SEQ/f-%05d.png" \
+		-frames:v "$n" -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -colorspace bt709 \
+		-movflags +faststart -an "out/clips/VU-${NAMES[$k]}.mp4"
+done
 
 rm -rf "$SEQ"
 echo "✔ out/vision-urbaine.mp4 and out/vision-urbaine-compatible.mp4 ($FRAMES frames)"
