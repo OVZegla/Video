@@ -5,7 +5,7 @@
 #   out/vision-urbaine.mp4             H.264 High, CRF 16 (small, high quality)
 #   out/vision-urbaine-compatible.mp4  H.264 Constrained Baseline, CBR 3 Mb/s,
 #                                      1 s GOP, no B-frames (for picky LED players)
-#   out/clips/VU-0x-*.mp4              the loop cut into ≤ 15 s clips at scene changes
+#   out/clips/VU-0x-*-$VERSION.mp4     the loop cut into ≤ 15 s clips at scene changes
 #
 # Usage: scripts/render.sh [--browser-executable=/path/to/chrome]
 # An interrupted render resumes: finished chunks are kept in FRAMES_DIR.
@@ -14,6 +14,9 @@ cd "$(dirname "$0")/.."
 
 FRAMES=2490
 CHUNK=150
+# LED players cache files by name: bump VERSION for every new delivery so the
+# screen picks up the new clips instead of replaying the old ones.
+VERSION=${VERSION:-v2}
 SEQ=${FRAMES_DIR:-${TMPDIR:-/tmp}/vu_frames} # no dot in the name: Remotion rejects it
 mkdir -p "$SEQ"
 frame() { printf '%s/f-%05d.png' "$SEQ" "$1"; }
@@ -64,7 +67,7 @@ for ((k = 0; k < ${#NAMES[@]}; k++)); do
 	n=$((CUTS[k + 1] - a))
 	npx remotion ffmpeg -y -loglevel error -framerate 30 -start_number "$a" -i "$SEQ/f-%05d.png" \
 		-frames:v "$n" -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -colorspace bt709 \
-		-movflags +faststart -an "out/clips/VU-${NAMES[$k]}.mp4"
+		-movflags +faststart -an "out/clips/VU-${NAMES[$k]}-$VERSION.mp4"
 done
 
 rm -rf "$SEQ"
