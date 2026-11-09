@@ -1,0 +1,2 @@
+{ "name": "conte-web", "private": true, "scripts": { "build": "sh build.sh" },
+  "dependencies": { "three": "0.160.0", "esbuild": "0.20.2" } }
