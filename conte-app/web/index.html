@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Les Trois Petits Cochons</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#fff;font-family:"Comic Sans MS","Chalkboard SE",sans-serif}
+canvas{display:block}
+#subtitle{position:fixed;left:50%;bottom:4vh;transform:translateX(-50%) translateY(20px);max-width:88vw;width:max-content;padding:14px 26px;border-radius:24px;background:#7a3cff;color:#fff;font-size:clamp(18px,4.6vw,44px);text-align:center;box-shadow:0 6px 0 #ff6fa1;opacity:0;transition:.3s}
+#subtitle.loup{background:#3d4466;box-shadow:0 6px 0 #1d2033}
+#subtitle.cochon{background:#e8508a;box-shadow:0 6px 0 #9c2a5a}
+#subtitle.on{opacity:1;transform:translateX(-50%) translateY(0)}
+#title{position:fixed;top:5vh;width:100%;text-align:center;font-size:clamp(32px,10vw,90px);line-height:1.05;padding:0 4vw;box-sizing:border-box;color:#ff6fa1;text-shadow:4px 4px 0 #7a3cff;opacity:0;transition:.6s}
+#title.on{opacity:1}
+#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px;color:#7a3cff}
+</style></head><body>
+<div id="loading">Chargement…</div>
+<div id="title">Les Trois Petits Cochons</div>
+<div id="subtitle"></div>
+<script src="app.js"></script>
+</body></html>
