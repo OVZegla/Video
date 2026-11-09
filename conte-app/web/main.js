@@ -68,7 +68,10 @@ scene.background = new THREE.Color(0xffffff); // blanc = transparent sur la born
 
 const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 200);
 camera.position.set(0, 10, 17);
-camera.lookAt(0, 0.6, -3.5);
+const CAM_POS = new THREE.Vector3(0, 10, 17), CAM_LOOK = new THREE.Vector3(0, 0.6, -3.5);
+const camLook = CAM_LOOK.clone();
+let camFocus = null; // objet sur lequel zoomer
+camera.lookAt(camLook);
 function fitCamera() {
   const a = innerWidth / innerHeight;
   const hHalf = Math.tan(THREE.MathUtils.degToRad(19));
@@ -333,7 +336,7 @@ Object.values(houses).forEach((h) => { h.scale.setScalar(0.001); scene.add(h); }
 const pigs = [makePig({ shirt: 0x6cc24a, hat: 'paille' }), makePig({ shirt: 0x3b82d6, hat: 'casquette' }), makePig({ shirt: 0xe0533d, hat: 'chantier' })];
 pigs.forEach((p) => { p.visible = false; scene.add(p); });
 const wolf = makeWolf();
-wolf.visible = false; scene.add(wolf);
+wolf.visible = false; wolf.scale.setScalar(1.25); scene.add(wolf);
 const W = wolf.userData;
 
 // =====================================================================
@@ -498,6 +501,8 @@ let chimneyFire = false;
 // Le loup inspire (torse + joues gonflés, tête en arrière) puis souffle (bouche en O, penché en avant)
 async function wolfBlow(line, target) {
   wolf.rotation.y = Math.PI / 2;
+  camFocus = wolf;
+  await wait(500);
   await tween(1.1, (k) => { W.puff = ease(k); });
   W.blowing = true;
   windOn = { dir: new THREE.Vector3(1, 0, 0), straw: target === houses.paille };
@@ -510,6 +515,7 @@ async function wolfBlow(line, target) {
   await Promise.all([say(line, { pause: 0 }), anim]);
   W.blowing = false; W.blow = 0; W.puff = 0;
   target.rotation.z = 0;
+  setTimeout(() => { camFocus = null; }, 1600);
 }
 
 async function story() {
@@ -547,7 +553,7 @@ async function story() {
   pigs[0].visible = false;
   await say('Mais dans la forêt rôdait le grand méchant loup… et il avait très, très faim !', { gesture: 'No' });
   wolf.visible = true;
-  await moveTo(wolf, -6, -2.6, 1.8); wolf.rotation.y = Math.PI / 2;
+  await moveTo(wolf, -5.4, -1.8, 1.8); wolf.rotation.y = Math.PI / 2;
   await say('Il frappa à la porte de la maison de paille.');
   await say('[loup]Petit cochon, petit cochon, laisse-moi entrer !');
   await say('[cochon]Non, non, par les poils de mon menton !');
@@ -562,7 +568,7 @@ async function story() {
   await moveTo(pigs[0], 3, -0.6, 1.4);
   pigs[0].visible = false; pigs[1].visible = false;
 
-  await moveTo(wolf, 0.2, -2.6, 1.6); wolf.rotation.y = Math.PI / 2;
+  await moveTo(wolf, 0.4, -1.8, 1.6); wolf.rotation.y = Math.PI / 2;
   await say('[loup]Petits cochons, petits cochons, laissez-moi entrer !');
   await say('[cochon]Non, non, jamais de la vie !');
   await wolfBlow('[loup]Ffffffffouuuuuuuuuuuuuuh !', houses.bois);
@@ -714,6 +720,17 @@ function animate() {
     spawn(m, { vel: new THREE.Vector3(0.3, -0.6, 0.2), max: 4, spin: new THREE.Vector3(2, 3, 1), wobble: 1 });
   }
 
+  // Caméra : zoom doux sur le loup quand il souffle
+  const k = 1 - Math.exp(-2.5 * dt);
+  if (camFocus) {
+    camera.position.lerp(tmp.copy(camFocus.position).add(new THREE.Vector3(2.6, 3.2, 8.5)), k);
+    camLook.lerp(tmp.copy(camFocus.position).add(new THREE.Vector3(2.2, 1.6, 0)), k);
+  } else {
+    camera.position.lerp(CAM_POS, k);
+    camLook.lerp(CAM_LOOK, k);
+  }
+  camera.lookAt(camLook);
+
   renderer.render(scene, camera);
 }
 
@@ -729,7 +746,6 @@ new GLTFLoader().parse(bin, '', (gltf) => {
   narrator.traverse((o) => {
     if (o.isMesh) o.material = new THREE.MeshToonMaterial({ color: o.material.color, gradientMap });
   });
-  outline(narrator, 0.02);
   face = narrator.getObjectByName('Head_4');
   scene.add(narrator);
   mixer = new THREE.AnimationMixer(narrator);
