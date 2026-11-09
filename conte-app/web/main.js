@@ -343,7 +343,7 @@ async function story() {
   Object.values(houses).forEach(resetHouse);
   pigs.forEach((p, i) => { p.position.set(-1.5 + i * 1.5, 0, 3); p.visible = false; p.scale.setScalar(0.001); });
   wolf.visible = false; wolf.position.set(-14, 0, 1); wolf.rotation.set(0, 0, 0);
-  narrator.position.set(4.6, 0, 3.2); narrator.rotation.y = -0.45;
+  narrator.position.set(4.4, 0, 6); narrator.rotation.y = -0.4;
   titleEl.classList.add('on');
   play('Idle');
   await wait(800);
@@ -504,7 +504,7 @@ addEventListener('resize', () => {
 const bin = Uint8Array.from(atob(MODEL_B64), (c) => c.charCodeAt(0)).buffer;
 new GLTFLoader().parse(bin, '', (gltf) => {
   narrator = gltf.scene;
-  narrator.scale.setScalar(0.75);
+  narrator.scale.setScalar(0.55);
   narrator.traverse((o) => { if (o.isMesh) o.castShadow = true; });
   face = narrator.getObjectByName('Head_4');
   scene.add(narrator);
