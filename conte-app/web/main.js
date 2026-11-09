@@ -35,12 +35,19 @@ renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x9fd8ff);
-scene.fog = new THREE.Fog(0x9fd8ff, 25, 60);
+scene.background = new THREE.Color(0xffffff); // blanc = transparent sur la borne holographique
 
-const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 200);
-camera.position.set(0, 4.2, 13);
-camera.lookAt(0, 2, 0);
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 200);
+camera.position.set(0, 10, 17);
+camera.lookAt(0, 0.6, -3.5);
+function fitCamera() {
+  // garde ~13 unités de large visibles, quel que soit le ratio (portrait)
+  const a = innerWidth / innerHeight;
+  const hHalf = Math.tan(THREE.MathUtils.degToRad(19));
+  camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.max(hHalf / a, Math.tan(THREE.MathUtils.degToRad(22)))));
+  camera.aspect = a; camera.updateProjectionMatrix();
+}
+fitCamera();
 
 scene.add(new THREE.HemisphereLight(0xffffff, 0x6a8f3a, 1.1));
 const sun = new THREE.DirectionalLight(0xffffff, 1.6);
@@ -51,10 +58,8 @@ Object.assign(sun.shadow.camera, { left: -15, right: 15, top: 15, bottom: -15 })
 scene.add(sun);
 
 // Sol + décor
-const ground = new THREE.Mesh(new THREE.CircleGeometry(40, 48), new THREE.MeshLambertMaterial({ color: 0x7ccf5a }));
+const ground = new THREE.Mesh(new THREE.CircleGeometry(40, 48), new THREE.ShadowMaterial({ opacity: 0.18 }));
 ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
-const path = new THREE.Mesh(new THREE.PlaneGeometry(30, 2.2), new THREE.MeshLambertMaterial({ color: 0xd9b77a }));
-path.rotation.x = -Math.PI / 2; path.position.set(0, 0.01, 1.5); scene.add(path);
 
 function tree(x, z, s = 1) {
   const g = new THREE.Group();
@@ -67,7 +72,7 @@ function tree(x, z, s = 1) {
   });
   g.position.set(x, 0, z); scene.add(g); return g;
 }
-const trees = [tree(-11, -6, 1.4), tree(-8, -9, 1.1), tree(10, -8, 1.3), tree(13, -4, 1), tree(-14, -2, 1.2), tree(6, -12, 1.5)];
+const trees = [tree(-5.5, -8, 1.3), tree(5.5, -9, 1.2), tree(-3, -12, 1.1), tree(3.5, -13, 1.4)];
 
 // Nuages
 const clouds = [];
@@ -79,7 +84,7 @@ for (let i = 0; i < 6; i++) {
     p.position.set(j * 1.1, Math.random() * 0.4, Math.random() * 0.5); c.add(p);
   }
   c.position.set(-25 + i * 9, 10 + Math.random() * 3, -18 - Math.random() * 6);
-  scene.add(c); clouds.push(c);
+  clouds.push(c); // nuages blancs = invisibles sur la borne, non ajoutés
 }
 
 // ---------- Petits personnages procéduraux ----------
@@ -187,13 +192,13 @@ const houses = {
   bois: makeHouse('bois'),
   briques: makeHouse('briques'),
 };
-houses.paille.position.set(-6, 0, -2.5);
-houses.bois.position.set(6, 0, -2.5);
-houses.briques.position.set(0, 0, -5.5);
+houses.paille.position.set(-3.6, 0, -3);
+houses.bois.position.set(3.6, 0, -3);
+houses.briques.position.set(0, 0, -7);
 Object.values(houses).forEach((h) => { h.scale.setScalar(0.001); scene.add(h); });
 
 const pigs = [makePig(0xffd23f), makePig(0x3fa7ff), makePig(0xff5a3f)];
-pigs.forEach((p, i) => { p.position.set(-1.5 + i * 1.5, 0, 3); p.visible = false; scene.add(p); });
+pigs.forEach((p, i) => { p.position.set(-1.5 + i * 1.5, 0, 1); p.visible = false; scene.add(p); });
 const wolf = makeWolf();
 wolf.visible = false; scene.add(wolf);
 
@@ -202,7 +207,7 @@ const particles = [];
 const leafGeo = new THREE.PlaneGeometry(0.25, 0.15);
 const leafMats = [0x4caf50, 0xf2a93b, 0xd9562b, 0x9ccc65].map((c) => new THREE.MeshLambertMaterial({ color: c, side: THREE.DoubleSide }));
 const strawMat = new THREE.MeshLambertMaterial({ color: 0xf2d36b, side: THREE.DoubleSide });
-const windMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7, side: THREE.DoubleSide });
+const windMat = new THREE.MeshBasicMaterial({ color: 0x5fb8ff, transparent: true, opacity: 0.7, side: THREE.DoubleSide });
 const windGeo = new THREE.PlaneGeometry(1.6, 0.05);
 const strawGeo = new THREE.PlaneGeometry(0.4, 0.04);
 const sparkGeo = new THREE.OctahedronGeometry(0.08);
@@ -226,7 +231,7 @@ function emitLeaves(from, dir, count = 4, mat) {
     spawn(m, { vel: dir.clone().multiplyScalar(5 + Math.random() * 5).add(new THREE.Vector3(0, 1 + Math.random() * 2, 0)), max: 2.5, spin: new THREE.Vector3(Math.random() * 8, Math.random() * 8, Math.random() * 8), gravity: -1.5, wobble: 2 });
   }
 }
-function emitSparkles(center, count = 20, colors = [0xffe066, 0xff8fab, 0x8fd3ff, 0xb388ff]) {
+function emitSparkles(center, count = 20, colors = [0xffc400, 0xff8fab, 0x8fd3ff, 0xb388ff]) {
   for (let i = 0; i < count; i++) {
     const m = new THREE.Mesh(sparkGeo, new THREE.MeshBasicMaterial({ color: colors[i % colors.length], transparent: true }));
     m.position.copy(center);
@@ -341,9 +346,9 @@ async function blowSequence(house, label) {
 async function story() {
   // remise à zéro
   Object.values(houses).forEach(resetHouse);
-  pigs.forEach((p, i) => { p.position.set(-1.5 + i * 1.5, 0, 3); p.visible = false; p.scale.setScalar(0.001); });
+  pigs.forEach((p, i) => { p.position.set(-1.5 + i * 1.5, 0, 1); p.visible = false; p.scale.setScalar(0.001); });
   wolf.visible = false; wolf.position.set(-14, 0, 1); wolf.rotation.set(0, 0, 0);
-  narrator.position.set(4.4, 0, 6); narrator.rotation.y = -0.4;
+  narrator.position.set(2.1, 0, 5.2); narrator.rotation.y = -0.3;
   titleEl.classList.add('on');
   play('Idle');
   await wait(800);
@@ -351,24 +356,24 @@ async function story() {
   titleEl.classList.remove('on');
   await say('C\'est l\'histoire des Trois Petits Cochons !', { gesture: 'ThumbsUp' });
 
-  emitSparkles(new THREE.Vector3(0, 1, 3), 30);
+  emitSparkles(new THREE.Vector3(0, 1, 1), 30);
   await Promise.all(pigs.map((p) => pop(p, 0.9)));
   await say('Il était une fois trois petits cochons qui partirent de chez leur maman pour construire chacun leur maison.', { gesture: 'Yes' });
 
   // Maison de paille
-  await moveTo(pigs[0], -5.2, 0.2);
-  emitSparkles(houses.paille.position.clone().add(new THREE.Vector3(0, 1, 0)), 25, [0xf2d36b, 0xffffff]);
+  await moveTo(pigs[0], -3, -0.6);
+  emitSparkles(houses.paille.position.clone().add(new THREE.Vector3(0, 1, 0)), 25, [0xf2d36b, 0xffc400]);
   pop(houses.paille);
   await say('Le premier petit cochon, un peu paresseux, construisit une maison en paille. Vite fait, et hop, au lit !');
 
   // Maison de bois
-  await moveTo(pigs[1], 5.2, 0.2);
-  emitSparkles(houses.bois.position.clone().add(new THREE.Vector3(0, 1, 0)), 25, [0xa0632f, 0xffffff]);
+  await moveTo(pigs[1], 3, -0.6);
+  emitSparkles(houses.bois.position.clone().add(new THREE.Vector3(0, 1, 0)), 25, [0xa0632f, 0xffc400]);
   pop(houses.bois);
   await say('Le deuxième construisit une maison en bois. Un peu plus solide… mais pas tellement !');
 
   // Maison de briques
-  await moveTo(pigs[2], 1.4, -3.4, 1.4);
+  await moveTo(pigs[2], 1.4, -4.9, 1.4);
   emitSparkles(houses.briques.position.clone().add(new THREE.Vector3(0, 1.5, 0)), 35, [0xc0442f, 0xffe066]);
   pop(houses.briques);
   await say('Et le troisième, très courageux, travailla dur pour construire une maison en briques, bien solide.', { gesture: 'ThumbsUp' });
@@ -377,36 +382,36 @@ async function story() {
   pigs[0].visible = false; // entré dans sa maison
   await say('Mais dans la forêt… rôdait un grand méchant loup, qui avait très, très faim !', { gesture: 'No' });
   wolf.visible = true; wolf.rotation.y = Math.PI / 2;
-  await moveTo(wolf, -9, 0.5, 1.6);
+  await moveTo(wolf, -5.9, -2.6, 1.6);
   await say('Il frappa à la porte de la maison de paille : « Petit cochon, petit cochon, laisse-moi entrer ! »');
   await say('« Non, non, par les poils de mon menton ! » répondit le petit cochon.', { gesture: 'No' });
   await say('« Alors je vais souffler, et ta maison s\'envolera ! »');
 
   let dir = await blowSequence(houses.paille, 'paille');
   blowAway(houses.paille, dir);
-  pigs[0].visible = true; pigs[0].position.set(-5, 0, 0.6);
+  pigs[0].visible = true; pigs[0].position.set(-3, 0, -0.4);
   await wait(800);
   windOn = null;
   await say('La maison de paille s\'envola ! Le petit cochon courut se cacher chez son frère, dans la maison de bois.', { gesture: 'Jump' });
   pigs[0].rotation.y = Math.PI / 2;
-  await moveTo(pigs[0], 4.6, 0.3, 1.6);
+  await moveTo(pigs[0], 3, -0.6, 1.6);
   pigs[0].visible = false; pigs[1].visible = false;
 
-  await moveTo(wolf, 1.5, 0.5, 1.6);
+  await moveTo(wolf, 0.2, -2.2, 1.6);
   await say('Le loup arriva devant la maison de bois : « Petits cochons, laissez-moi entrer ! » « Non, non, jamais ! »');
   dir = await blowSequence(houses.bois, 'bois');
   blowAway(houses.bois, dir);
   pigs[0].visible = pigs[1].visible = true;
-  pigs[0].position.set(5, 0, 0.8); pigs[1].position.set(5.8, 0, 0.4);
+  pigs[0].position.set(3, 0, -0.4); pigs[1].position.set(3.8, 0, -0.8);
   await wait(800);
   windOn = null;
   await say('Patatras ! La maison de bois s\'écroula aussi ! Les deux petits cochons coururent chez leur frère, dans la maison de briques.', { gesture: 'Jump' });
   pigs.slice(0, 2).forEach((p) => (p.rotation.y = -Math.PI / 2));
-  await Promise.all([moveTo(pigs[0], 0.4, -3.4, 1.5), moveTo(pigs[1], -0.6, -3.4, 1.5)]);
+  await Promise.all([moveTo(pigs[0], 0.4, -4.9, 1.5), moveTo(pigs[1], -0.6, -4.9, 1.5)]);
   pigs.forEach((p) => (p.visible = false));
 
   wolf.rotation.y = -Math.PI / 2;
-  await moveTo(wolf, -2.6, -2.8, 1.3);
+  await moveTo(wolf, -2.8, -5.6, 1.3);
   wolf.rotation.y = Math.PI / 2;
   await say('Le loup, furieux, arriva devant la maison de briques. Il souffla, souffla, souffla encore…');
   windOn = { from: wolf.position.clone().add(new THREE.Vector3(0.8, 1.8, 0.3)), dir: new THREE.Vector3(1, 0, 0) };
@@ -415,17 +420,17 @@ async function story() {
   await shake; windOn = null;
 
   await say('Alors le loup grimpa sur le toit pour descendre par la cheminée…');
-  await tween(1.4, (k) => { wolf.position.set(-2.6 + 3.2 * k, Math.sin(k * Math.PI) * 2.5 + 3.4 * k, -2.8 - 2.7 * k); });
+  await tween(1.4, (k) => { wolf.position.set(-2.8 + 3.4 * k, Math.sin(k * Math.PI) * 2.5 + 3.4 * k, -5.6 - 1.4 * k); });
   chimneyFire = true;
   await say('Mais le petit cochon avait mis une grande marmite d\'eau bouillante sur le feu ! Plouf ! Aïe aïe aïe !', { gesture: 'Jump' });
   // le loup s'enfuit
-  await tween(1.6, (k) => { wolf.position.set(0.6 - 16 * k, 3.4 + Math.sin(k * Math.PI) * 4 - 3.4 * k, -5.5 + 4 * k); wolf.rotation.z = k * 12; });
+  await tween(1.6, (k) => { wolf.position.set(0.6 - 14 * k, 3.4 + Math.sin(k * Math.PI) * 4 - 3.4 * k, -7 + 4 * k); wolf.rotation.z = k * 12; });
   chimneyFire = false; wolf.visible = false;
   await say('Le grand méchant loup s\'enfuit en hurlant, et on ne le revit plus jamais !', { gesture: 'Yes' });
 
-  pigs.forEach((p, i) => { p.visible = true; p.position.set(-1.6 + i * 1.6, 0, -2.6); p.rotation.y = 0; });
+  pigs.forEach((p, i) => { p.visible = true; p.position.set(-1.6 + i * 1.6, 0, -3.6); p.rotation.y = 0; });
   pigs.forEach((p) => (p.userData.dance = true));
-  for (let i = 0; i < 4; i++) emitSparkles(new THREE.Vector3(-3 + i * 2, 2.5, -1), 30);
+  for (let i = 0; i < 4; i++) emitSparkles(new THREE.Vector3(-3 + i * 2, 2.5, -3), 30);
   play('Dance');
   await say('Et les trois petits cochons vécurent heureux, bien à l\'abri dans leur maison de briques.');
   await say('Et voilà ! L\'histoire est finie. À bientôt les enfants !', { gesture: 'Wave' });
@@ -496,7 +501,7 @@ function animate() {
 }
 
 addEventListener('resize', () => {
-  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  fitCamera();
   renderer.setSize(innerWidth, innerHeight);
 });
 
@@ -504,7 +509,7 @@ addEventListener('resize', () => {
 const bin = Uint8Array.from(atob(MODEL_B64), (c) => c.charCodeAt(0)).buffer;
 new GLTFLoader().parse(bin, '', (gltf) => {
   narrator = gltf.scene;
-  narrator.scale.setScalar(0.55);
+  narrator.scale.setScalar(0.65);
   narrator.traverse((o) => { if (o.isMesh) o.castShadow = true; });
   face = narrator.getObjectByName('Head_4');
   scene.add(narrator);
