@@ -65,8 +65,9 @@ public class MainActivity extends Activity {
 
     class Bridge {
         @JavascriptInterface
-        public void speak(String text, String id) {
+        public void speak(String text, String id, float pitch) {
             if (!ttsReady) { done(id); return; }
+            tts.setPitch(pitch);
             if (Build.VERSION.SDK_INT >= 21) {
                 Bundle p = new Bundle();
                 tts.speak(text, TextToSpeech.QUEUE_ADD, p, id);
